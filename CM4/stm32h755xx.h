@@ -126,234 +126,217 @@ typedef struct { //with offset addr of each
  * peripheral definition register map for RCC
  */
 
-typedef struct {
-	__vo uint32_t Cr; //0x000
-	__vo uint32_t HsiCfgr; //0x004
-	__vo uint32_t Crrcr; //0x008
-	__vo uint32_t CsiCfgr; //0x00c
-	__vo uint32_t Cfgr; //0x010
-	uint32_t RESERVED0; //0x014
-	__vo uint32_t D1Cfgr; //0x018
-	__vo uint32_t D2Cfgr; //0x01c
-	__vo uint32_t D3Cfgr; //0x020
-	uint32_t RESERVED1; //0x024
-	__vo uint32_t PllCkSelr; //0x028
-	__vo uint32_t PllCfgr; //0x02c
-	__vo uint32_t Pll1Divr; //0x030
-	__vo uint32_t Pll1Fracr; //0x034
-	__vo uint32_t Pll2Divr; //0x038
-	__vo uint32_t Pll2Fracr; //0x03c
-	__vo uint32_t Pll3Divr; //0x040
-	__vo uint32_t Pll3Fracr; //0x044
-	uint32_t RESERVED2; //0x048
-	__vo uint32_t D1Ccipr; //0x04c
-	__vo uint32_t D2Ccip1r; //0x050
-	__vo uint32_t D2Ccip2r; //0x054
-	__vo uint32_t D3Ccipr; //0x058
-	uint32_t RESERVED3; //0x05c
-	__vo uint32_t Cier; //0x060
-	__vo uint32_t Cifr; //0x064
-	__vo uint32_t Cicr; //0x068
-	uint32_t RESERVED4; //0x06c
-	__vo uint32_t Bdcr; //0x070
-	__vo uint32_t Csr; //0x074
-	uint32_t RESERVED5; //0x078
-	__vo uint32_t Ahb3Rstr; //0x07c
-	__vo uint32_t Ahb1Rstr; //0x080
-	__vo uint32_t Ahb2Rstr; //0x084
-	__vo uint32_t Ahb4Rstr; //0x088
-	__vo uint32_t Apb3Rstr; //0x08c
-	__vo uint32_t Apb1Lrstr; //0x090
-	__vo uint32_t Apb1Hrstr; //0x094
-	__vo uint32_t Apb2Rstr; //0x098
-	__vo uint32_t Apb4Rstr; //0x09c
-	__vo uint32_t Gcr; //0x0A0
-	uint32_t RESERVED6; //0x0A4
-	__vo uint32_t D3Amr; //0x0a8
-	uint32_t RESERVED7; //0x0AC - CC
-	__vo uint32_t Rsr; //0x0d0
-	__vo uint32_t Ahb3Enr; //0x0d4
-	__vo uint32_t Ahb1Enr; //0x0d8
-	__vo uint32_t Ahb2Enr; //0x0dc
-	__vo uint32_t Ahb4Enr; //0x0e0
-	__vo uint32_t Apb3Enr; //0x0e4
-	__vo uint32_t Apb1Lenr; //0x0e8
-	__vo uint32_t Apb1Henr; //0x0ec
-	__vo uint32_t Apb2Enr; //0x0f0
-	__vo uint32_t Apb4Enr; //0x0f4
-	uint32_t RESERVED8; //0x0f8
-	__vo uint32_t Ahb3Lpenr; //0x0fc
-	__vo uint32_t Ahb1Lpenr; //0x100
-	__vo uint32_t Ahb2Lpenr; //0x104
-	__vo uint32_t Ahb4Lpenr; //0x108
-	__vo uint32_t Apb3Lpenr; //0x10c
-	__vo uint32_t Apb1Llpenr; //0x110
-	__vo uint32_t Apb1Hlpenr; //0x114
-	__vo uint32_t Apb2Lpenr; //0x118
-	__vo uint32_t Apb4Lpenr; //0x11c
-	uint32_t RESERVED9; //0x120 - 12c
-	__vo uint32_t C1_Rsr; //0x130
-	__vo uint32_t C1_Ahb3Enr; //0x134
-	__vo uint32_t C1_Ahb1Enr; //0x138
-	__vo uint32_t C1_Ahb2Enr; //0x13c
-	__vo uint32_t C1_Ahb4Enr; //0x140
-	__vo uint32_t C1_Apb3Enr; //0x144
-	__vo uint32_t C1_Apb1Lenr; //0x148
-	__vo uint32_t C1_Apb1Henr; //0x14c
-	__vo uint32_t C1_Apb2Enr; //0x150
-	__vo uint32_t C1_Apb4Enr; //0x154
-	uint32_t RESERVED10; //0x158
-	__vo uint32_t C1_Ahb3Lpenr; //0x15c
-	__vo uint32_t C1_Ahb1Lpenr; //0x160
-	__vo uint32_t C1_Ahb2Lpenr; //0x164
-	__vo uint32_t C1_Ahb4Lpenr; //0x168
-	__vo uint32_t C1_Apb3Lpenr; //0x16c
-	__vo uint32_t C1_Apb1Llpenr; //0x170
-	__vo uint32_t C1_Apb1Hlpenr; //0x174
-	__vo uint32_t C1_Apb2Lpenr; //0x178
-	__vo uint32_t C1_Apb4Lpenr; //0x17c
-	uint32_t RESERVED11; //0x180-18c
-	__vo uint32_t C2_Rsr; //0x190
-	__vo uint32_t C2_Ahb3Enr; //0x194
-	__vo uint32_t C2_Ahb1Enr; //0x198
-	__vo uint32_t C2_Ahb2Enr; //0x19c
-	__vo uint32_t C2_Ahb4Enr; //0x1a0
-	__vo uint32_t C2_Apb3Enr; //0x1a4
-	__vo uint32_t C2_Apb1Lenr; //0x1a8
-	__vo uint32_t C2_Apb1Henr; //0x1ac
-	__vo uint32_t C2_Apb2Enr; //0x1b0
-	__vo uint32_t C2_Apb4Enr; //0x1b4
-	uint32_t RESERVED12; //0x1B8
-	__vo uint32_t C2_Ahb3Lpenr; //0x1bc
-	__vo uint32_t C2_Ahb1Lpenr; //0x1c0
-	__vo uint32_t C2_Ahb2Lpenr; //0x1c4
-	__vo uint32_t C2_Ahb4Lpenr; //0x1c8
-	__vo uint32_t C2_Apb3Lpenr; //0x1cc
-	__vo uint32_t C2_Apb1Llpenr; //0x1d0
-	__vo uint32_t C2_Apb1Hlpenr; //0x1d4
-	__vo uint32_t C2_Apb2Lpenr; //0x1d8
-	__vo uint32_t C2_Apb4Lpenr; //0x1dc
-	uint32_t RESERVED13; //0x1e0 - 1fc
+#define RCC_CR		(uint32_t *)(RCC_BASEADDR + 0x00)
+#define RCC_HSICFGR		(uint32_t *)(RCC_BASEADDR + 0x04)
+#define RCC_CRRCR		(uint32_t *)(RCC_BASEADDR + 0x08)
+#define RCC_CSICFGR		(uint32_t *)(RCC_BASEADDR + 0x0C)
+#define RCC_CFGR		(uint32_t *)(RCC_BASEADDR + 0x10)
+#define RCC_D1CFGR		(uint32_t *)(RCC_BASEADDR + 0x18)
+#define RCC_D2CFGR		(uint32_t *)(RCC_BASEADDR + 0x1C)
+#define RCC_D3CFGR		(uint32_t *)(RCC_BASEADDR + 0x20)
+#define RCC_PLLCKSELR		(uint32_t *)(RCC_BASEADDR + 0x28)
+#define RCC_PLLCFGR		(uint32_t *)(RCC_BASEADDR + 0x2C)
+#define RCC_PLL1DIVR		(uint32_t *)(RCC_BASEADDR + 0x30)
+#define RCC_PLL1FRACR		(uint32_t *)(RCC_BASEADDR + 0x34)
+#define RCC_PLL2DIVR		(uint32_t *)(RCC_BASEADDR + 0x38)
+#define RCC_PLL2FRACR		(uint32_t *)(RCC_BASEADDR + 0x3C)
+#define RCC_PLL3DIVR		(uint32_t *)(RCC_BASEADDR + 0x40)
+#define RCC_D1CCIPR		(uint32_t *)(RCC_BASEADDR + 0x4C)
+#define RCC_D2CCIP1R		(uint32_t *)(RCC_BASEADDR + 0x50)
+#define RCC_D2CCIP2R		(uint32_t *)(RCC_BASEADDR + 0x54)
+#define RCC_D3CCIPR		(uint32_t *)(RCC_BASEADDR + 0x58)
+#define RCC_CIER		(uint32_t *)(RCC_BASEADDR + 0x60)
+#define RCC_CIFR		(uint32_t *)(RCC_BASEADDR + 0x64)
+#define RCC_CICR		(uint32_t *)(RCC_BASEADDR + 0x68)
+#define RCC_BDCR		(uint32_t *)(RCC_BASEADDR + 0x70)
+#define RCC_CSR		(uint32_t *)(RCC_BASEADDR + 0x74)
+#define RCC_AHB3RSTR		(uint32_t *)(RCC_BASEADDR + 0x7C)
+#define RCC_AHB1RSTR		(uint32_t *)(RCC_BASEADDR + 0x80)
+#define RCC_AHB2RSTR		(uint32_t *)(RCC_BASEADDR + 0x84)
+#define RCC_AHB4RSTR		(uint32_t *)(RCC_BASEADDR + 0x88)
+#define RCC_APB3RSTR		(uint32_t *)(RCC_BASEADDR + 0x8C)
+#define RCC_APB1LRSTR		(uint32_t *)(RCC_BASEADDR + 0x90)
+#define RCC_APB1HRSTR		(uint32_t *)(RCC_BASEADDR + 0x94)
+#define RCC_APB2RSTR		(uint32_t *)(RCC_BASEADDR + 0x98)
+#define RCC_APB4RSTR		(uint32_t *)(RCC_BASEADDR + 0x9C)
+#define RCC_GCR		(uint32_t *)(RCC_BASEADDR + 0xA0)
+#define RCC_D3AMR		(uint32_t *)(RCC_BASEADDR + 0xA8)
+#define RCC_RSR		(uint32_t *)(RCC_BASEADDR + 0xD0)
+#define RCC_AHB1ENR		(uint32_t *)(RCC_BASEADDR + 0xD8)
+#define RCC_AHB2ENR		(uint32_t *)(RCC_BASEADDR + 0xDC)
+#define RCC_AHB4ENR		(uint32_t *)(RCC_BASEADDR + 0xE0)
+#define RCC_APB3ENR		(uint32_t *)(RCC_BASEADDR + 0xE4)
+#define RCC_APB1LENR		(uint32_t *)(RCC_BASEADDR + 0xE8)
+#define RCC_APB1HENR		(uint32_t *)(RCC_BASEADDR + 0xEC)
+#define RCC_APB2ENR		(uint32_t *)(RCC_BASEADDR + 0xF0)
+#define RCC_APB4ENR		(uint32_t *)(RCC_BASEADDR + 0xF4)
+#define RCC_AHB3LPENR		(uint32_t *)(RCC_BASEADDR + 0xFC)
+#define RCC_AHB1LPENR		(uint32_t *)(RCC_BASEADDR + 0x100)
+#define RCC_AHB2LPENR		(uint32_t *)(RCC_BASEADDR + 0x104)
+#define RCC_AHB4LPENR		(uint32_t *)(RCC_BASEADDR + 0x108)
+#define RCC_APB3LPENR		(uint32_t *)(RCC_BASEADDR + 0x10C)
+#define RCC_APB1LLPENR		(uint32_t *)(RCC_BASEADDR + 0x110)
+#define RCC_APB1HLPENR		(uint32_t *)(RCC_BASEADDR + 0x114)
+#define RCC_APB2LPENR		(uint32_t *)(RCC_BASEADDR + 0x118)
+#define RCC_APB4LPENR		(uint32_t *)(RCC_BASEADDR + 0x11C)
 
-} Rcc_RegDef_t;
+#define RCC_C1_RSR		(uint32_t *)(RCC_BASEADDR + 0x130)
+#define RCC_C1_AHB3ENR		(uint32_t *)(RCC_BASEADDR + 0x134)
+#define RCC_C1_AHB1ENR		(uint32_t *)(RCC_BASEADDR + 0x138)
+#define RCC_C1_AHB2ENR		(uint32_t *)(RCC_BASEADDR + 0x13C)
+#define RCC_C1_AHB4ENR		(uint32_t *)(RCC_BASEADDR + 0x140)
+#define RCC_C1_APB3ENR		(uint32_t *)(RCC_BASEADDR + 0x144)
+#define RCC_C1_APB1LENR		(uint32_t *)(RCC_BASEADDR + 0x148)
+#define RCC_C1_APB1HENR		(uint32_t *)(RCC_BASEADDR + 0x14C)
+#define RCC_C1_APB2ENR		(uint32_t *)(RCC_BASEADDR + 0x150)
+#define RCC_C1_APB4ENR		(uint32_t *)(RCC_BASEADDR + 0x154)
+#define RCC_C1_AHB3LPENR		(uint32_t *)(RCC_BASEADDR + 0x15C)
+#define RCC_C1_AHB1LPENR		(uint32_t *)(RCC_BASEADDR + 0x160)
+#define RCC_C1_AHB2LPENR		(uint32_t *)(RCC_BASEADDR + 0x164)
+#define RCC_C1_AHB4LPENR		(uint32_t *)(RCC_BASEADDR + 0x168)
+#define RCC_C1_APB3LPENR		(uint32_t *)(RCC_BASEADDR + 0x16C)
+#define RCC_C1_APB1LLPENR		(uint32_t *)(RCC_BASEADDR + 0x170)
+#define RCC_C1_APB1HLPENR		(uint32_t *)(RCC_BASEADDR + 0x174)
+#define RCC_C1_APB2LPENR		(uint32_t *)(RCC_BASEADDR + 0x178)
+#define RCC_C1_APB4LPENR		(uint32_t *)(RCC_BASEADDR + 0x17C)
+
+#define RCC_C2_RSR		(uint32_t *)(RCC_BASEADDR + 0x190)
+#define RCC_C2_AHB3ENR		(uint32_t *)(RCC_BASEADDR + 0x194)
+#define RCC_C2_AHB1ENR		(uint32_t *)(RCC_BASEADDR + 0x198)
+#define RCC_C2_AHB2ENR		(uint32_t *)(RCC_BASEADDR + 0x19C)
+#define RCC_C2_AHB4ENR		(uint32_t *)(RCC_BASEADDR + 0x1A0)
+#define RCC_C2_APB3ENR		(uint32_t *)(RCC_BASEADDR + 0x1A4)
+#define RCC_C2_APB1LENR		(uint32_t *)(RCC_BASEADDR + 0x1A8)
+#define RCC_C2_APB1HENR		(uint32_t *)(RCC_BASEADDR + 0x1AC)
+#define RCC_C2_APB2ENR		(uint32_t *)(RCC_BASEADDR + 0x1B0)
+#define RCC_C2_APB4ENR		(uint32_t *)(RCC_BASEADDR + 0x1B4)
+#define RCC_C2_AHB3LPENR		(uint32_t *)(RCC_BASEADDR + 0x1BC)
+#define RCC_C2_AHB1LPENR		(uint32_t *)(RCC_BASEADDR + 0x1C0)
+#define RCC_C2_AHB2LPENR		(uint32_t *)(RCC_BASEADDR + 0x1C4)
+#define RCC_C2_AHB4LPENR		(uint32_t *)(RCC_BASEADDR + 0x1C8)
+#define RCC_C2_APB3LPENR		(uint32_t *)(RCC_BASEADDR + 0x1CC)
+#define RCC_C2_APB1LLPENR		(uint32_t *)(RCC_BASEADDR + 0x1D0)
+#define RCC_C2_APB1HLPENR		(uint32_t *)(RCC_BASEADDR + 0x1D4)
+#define RCC_C2_APB2LPENR		(uint32_t *)(RCC_BASEADDR + 0x1D8)
+#define RCC_C2_APB4LPENR		(uint32_t *)(RCC_BASEADDR + 0x1DC)
 
 /*
- * Rcc register definition
+ * EXTI register definition
  */
-//#define RCC		((Rcc_RegDef_t*)RCC_BASEADDR)
+
 #define RCC_AHB4ENR		(uint32_t *)(RCC_BASEADDR + 0x0e0)
 /*
  * Clock enable macro for gpiox aka clock enable for bus that this peri hangs on
  */
-#define GPIOA_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 0))
-#define GPIOB_PCLK_EN()		((RCC->Ahb4Enr) |= (1 << 1))
-#define GPIOC_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 2))
-#define GPIOD_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 3))
-#define GPIOE_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 4))
-#define GPIOF_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 5))
-#define GPIOG_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 6))
-#define GPIOH_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 7))
-#define GPIOI_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 8))
-#define GPIOJ_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 9))
-#define GPIOK_PCLK_EN()		(RCC->Ahb4Enr |= (1 << 10))
+#define GPIOA_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 0))
+#define GPIOB_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 1))
+#define GPIOC_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 2))
+#define GPIOD_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 3))
+#define GPIOE_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 4))
+#define GPIOF_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 5))
+#define GPIOG_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 6))
+#define GPIOH_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 7))
+#define GPIOI_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 8))
+#define GPIOJ_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 9))
+#define GPIOK_PCLK_EN()		(*(RCC_AHB4ENR) |= (1 << 10))
 
 //********* CLOCK DISABLE
-#define GPIOA_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 0))
-#define GPIOB_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 1))
-#define GPIOC_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 2))
-#define GPIOD_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 3))
-#define GPIOE_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 4))
-#define GPIOF_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 5))
-#define GPIOG_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 6))
-#define GPIOH_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 7))
-#define GPIOI_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 8))
-#define GPIOJ_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 9))
-#define GPIOK_PCLK_DI()		(RCC->Ahb4Enr &= ~(1 << 10))
+#define GPIOA_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 0))
+#define GPIOB_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 1))
+#define GPIOC_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 2))
+#define GPIOD_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 3))
+#define GPIOE_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 4))
+#define GPIOF_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 5))
+#define GPIOG_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 6))
+#define GPIOH_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 7))
+#define GPIOI_PCLK_DI()			(*(RCC_AHB4ENR) &= ~(1 << 8))
+#define GPIOJ_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 9))
+#define GPIOK_PCLK_DI()		(*(RCC_AHB4ENR) &= ~(1 << 10))
 
 
 /*
  * cLOCK ENABLE FOR I2Cx
  */
-#define I2C1_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 21))
-#define I2C2_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 22))
-#define I2C3_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 23))
-#define I2C4_PCLK_EN()		(RCC->Apb4Enr |= (1<< 7))
+#define I2C1_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 21))
+#define I2C2_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 22))
+#define I2C3_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 23))
+#define I2C4_PCLK_EN()		(*(RCC_APB4ENR) |= (1 << 7))
 
 //******** CLOCK DISABLE
-#define I2C1_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 21))
-#define I2C2_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 22))
-#define I2C3_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 23))
-#define I2C4_PCLK_DI()		(RCC->Apb4Enr &= ~(1<< 7))
+#define I2C1_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 21))
+#define I2C2_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 22))
+#define I2C3_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 23))
+#define I2C4_PCLK_DI()		(*(RCC_APB4ENR) &= ~(1 << 7))
 
 
 /*
  * Clock enable for Spix
  */
-#define SPI1_PCLK_EN()		(RCC->Apb2Enr |= (1<< 12))
-#define SPI2_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 14))
-#define SPI3_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 15))
-#define SPI4_PCLK_EN()		(RCC->Apb2Enr |= (1<< 13))
-#define SPI5_PCLK_EN()		(RCC->Apb2Enr |= (1<< 20))
-#define SPI6_PCLK_EN()		(RCC->Apb4Enr |= (1<< 5))
+#define SPI1_PCLK_EN()		(*(RCC_APB2ENR) |= (1 << 12))
+#define SPI2_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 14))
+#define SPI3_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 15))
+#define SPI4_PCLK_EN()		(*(RCC_APB2ENR) |= (1 << 13))
+#define SPI5_PCLK_EN()		(*(RCC_APB2ENR) |= (1 << 20))
+#define SPI6_PCLK_EN()		(*(RCC_APB4ENR) |= (1 << 5))
 
 //********** CLOCK DISABLE
-#define SPI1_PCLK_DI()		(RCC->Apb2Enr &= ~(1<< 12))
-#define SPI2_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 14))
-#define SPI3_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 15))
-#define SPI4_PCLK_DI()		(RCC->Apb2Enr &= ~(1<< 13))
-#define SPI5_PCLK_DI()		(RCC->Apb2Enr &= ~(1<< 20))
-#define SPI6_PCLK_DI()		(RCC->Apb4Enr &= ~(1<< 5))
+#define SPI1_PCLK_DI()		(*(RCC_APB2ENR) &= ~(1 << 12))
+#define SPI2_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 14))
+#define SPI3_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 15))
+#define SPI4_PCLK_DI()		(*(RCC_APB2ENR) &= ~(1 << 13))
+#define SPI5_PCLK_DI()		(*(RCC_APB2ENR) &= ~(1 << 20))
+#define SPI6_PCLK_DI()		(*(RCC_APB4ENR) &= ~(1 << 5))
 
 
 /*
  * Clock enable for Uartx
  */
-#define UART4_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 19))
-#define UART5_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 20))
-#define UART7_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 30))
-#define UART8_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 31))
+#define UART4_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 19))
+#define UART5_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 20))
+#define UART7_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 30))
+#define UART8_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 31))
 
 //****** CLOCK DISABLE
-#define UART4_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 19))
-#define UART5_PCLK_DI()		(RCC->Apb1Lenr  &= ~(1<< 20))
-#define UART7_PCLK_DI()		(RCC->Apb1Lenr  &= ~(1<< 30))
-#define UART8_PCLK_DI()		(RCC->Apb1Lenr  &= ~(1<< 31))
+#define UART4_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 19))
+#define UART5_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 20))
+#define UART7_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 30))
+#define UART8_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 31))
 
 /*
  * Clock enable for USartx
  */
-#define USART1_PCLK_EN()		(RCC->Apb2Enr |= (1<< 4))
-#define USART2_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 17))
-#define USART3_PCLK_EN()		(RCC->Apb1Lenr |= (1<< 18))
-#define USART6_PCLK_EN()		(RCC->Apb2Enr |= (1<< 5))
+#define USART1_PCLK_EN()		(*(RCC_APB2ENR) |= (1 << 4))
+#define USART2_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 17))
+#define USART3_PCLK_EN()		(*(RCC_APB1LENR) |= (1 << 18))
+#define USART6_PCLK_EN()		(*(RCC_APB2ENR) |= (1 << 5))
 //********* CLOCK DISABLE
-#define USART1_PCLK_DI()		(RCC->Apb2Enr &= ~(1<< 4))
-#define USART2_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 17))
-#define USART3_PCLK_DI()		(RCC->Apb1Lenr &= ~(1<< 18))
-#define USART6_PCLK_DI()		(RCC->Apb2Enr &= ~(1<< 5))
+#define USART1_PCLK_DI()		(*(RCC_APB2ENR) &= ~(1 << 4))
+#define USART2_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 17))
+#define USART3_PCLK_DI()		(*(RCC_APB1LENR) &= ~(1 << 18))
+#define USART6_PCLK_DI()		(*(RCC_APB2ENR) &= ~(1 << 5))
 
 
 /*
  * Clock enable for syscfg
  */
-#define SYSCFG_PCLK_EN()		(RCC->Apb4Enr |= (1<< 1))
+#define SYSCFG_PCLK_EN()		(*(RCC_APB4ENR) |= (1 << 1))
 ///**** CLOCK DISABLE
-#define SYSCFG_PCLK_DI()		(RCC->Apb4Enr &= ~(1<< 1))
+#define SYSCFG_PCLK_DI()		(*(RCC_APB4ENR) &= ~(1 << 1))
 
 /*
  * RESET GPIO MACRO
  */
-#define		GPIOA_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<0)); (RCC->Ahb4Rstr &= ~(1<<0)); }while(0)
-#define		GPIOB_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<1)); (RCC->Ahb4Rstr &= ~(1<<1)); }while(0)
-#define		GPIOC_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<2)); (RCC->Ahb4Rstr &= ~(1<<2)); }while(0)
-#define		GPIOD_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<3)); (RCC->Ahb4Rstr &= ~(1<<3)); }while(0)
-#define		GPIOE_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<4)); (RCC->Ahb4Rstr &= ~(1<<4)); }while(0)
-#define		GPIOF_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<5)); (RCC->Ahb4Rstr &= ~(1<<5)); }while(0)
-#define		GPIOG_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<6)); (RCC->Ahb4Rstr &= ~(1<<6)); }while(0)
-#define		GPIOH_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<7)); (RCC->Ahb4Rstr &= ~(1<<7)); }while(0)
-#define		GPIOI_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<8)); (RCC->Ahb4Rstr &= ~(1<<8)); }while(0)
-#define		GPIOJ_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<9)); (RCC->Ahb4Rstr &= ~(1<<9)); }while(0)
-#define		GPIOK_REG_RST()		do{ (RCC->Ahb4Rstr |= (1<<10)); (RCC->Ahb4Rstr &= ~(1<<10)); }while(0)
+#define		GPIOA_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<0)); (*(RCC_AHB4RSTR) &= ~(1<<0)); }while(0)
+#define		GPIOB_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<1)); (*(RCC_AHB4RSTR) &= ~(1<<1)); }while(0)
+#define		GPIOC_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<2)); (*(RCC_AHB4RSTR) &= ~(1<<2)); }while(0)
+#define		GPIOD_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<3)); (*(RCC_AHB4RSTR) &= ~(1<<3)); }while(0)
+#define		GPIOE_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<4)); (*(RCC_AHB4RSTR) &= ~(1<<4)); }while(0)
+#define		GPIOF_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<5)); (*(RCC_AHB4RSTR) &= ~(1<<5)); }while(0)
+#define		GPIOG_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<6)); (*(RCC_AHB4RSTR) &= ~(1<<6)); }while(0)
+#define		GPIOH_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<7)); (*(RCC_AHB4RSTR) &= ~(1<<7)); }while(0)
+#define		GPIOI_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<8)); (*(RCC_AHB4RSTR) &= ~(1<<8)); }while(0)
+#define		GPIOJ_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<9)); (*(RCC_AHB4RSTR) &= ~(1<<9)); }while(0)
+#define		GPIOK_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<10)); (*(RCC_AHB4RSTR) &= ~(1<<10)); }while(0)
 
 
 //some generic macros
