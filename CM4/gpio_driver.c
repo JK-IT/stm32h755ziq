@@ -23,21 +23,38 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 		pGpioHandle->pGpiox->Moder &= ~(0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
 		pGpioHandle->pGpiox->Moder |= temp; //set bit
 		temp = 0;
-	} else
+	} else //extended interrupt  = detects rising/ falling edge of peri/input event
 	{
 		if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_FT)
 		{
-
-		} else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RT)
-		{
-
-		} else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RFT)
-		{
-
+			EXTI->FTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
+			//clear the bit in rising edge detection
+			EXTI->RTSR1 &= ~(1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
 		}
-		//config port selection in syscfg_extireg
+		else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RT)
+		{
+			EXTI->RTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
+			//clear the bit in falling edge detection
+			EXTI->FTSR1 &= ~(1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
+		}
+		else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RFT)
+		{
+			//enable both detecting
+			EXTI->FTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
+			//clear the bit in rising edge detection
+			EXTI->RTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
+		}
+		//enable sys peripheral clock
+		SYSCFG_PCLK_EN();
 
-		//enable exti interrupt delivery using interrupt mask
+		//config port selection in syscfg_extireg
+		uint8_t temp1 = (pGpioHandle->Gpio_PinConfig.Gpio_PinNumber / 4);
+		uint8_t temp2 = (pGpioHandle->Gpio_PinConfig.Gpio_PinNumber % 4);
+		uint8_t portcode = GPIO_TO_PORTCODE(pGpioHandle->pGpiox);
+		SYSCFG->EXTICR[temp1] &= ~(0xf << (temp2 * 4));
+		SYSCFG->EXTICR[temp1] |= (portcode << (temp2 * 4));
+		//enable exti interrupt delivery using interrupt mask: 1-masked-enable, 0-unmasked-disable
+		EXTI->C1IMR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
 	}
 	temp = 0;
 	//2. speed
