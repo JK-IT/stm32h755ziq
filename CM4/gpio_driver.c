@@ -25,7 +25,19 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 		temp = 0;
 	} else
 	{
+		if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_FT)
+		{
 
+		} else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RT)
+		{
+
+		} else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RFT)
+		{
+
+		}
+		//config port selection in syscfg_extireg
+
+		//enable exti interrupt delivery using interrupt mask
 	}
 	temp = 0;
 	//2. speed
