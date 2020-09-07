@@ -42,7 +42,7 @@
 
 /*
  * base address of gpio a-k
-
+	BUS AHB4
  */
 
 #define GPIOA_BASEADDR	(AHB4_BASEADDR + 0x0000)
@@ -105,10 +105,11 @@ typedef struct { //with offset addr of each
 	__vo uint32_t Lckr;	//0x1c
 	__vo uint32_t Afr[2]; //0x20 afrl, 0x24 afrh
 
-}	Gpio_RegDef_t;
+}Gpio_RegDef_t;
 
 /*
  * peripheral definition of gpio - typecast to gpio regdef
+ * BUS AHB4
  */
 #define GPIOA		((Gpio_RegDef_t*)GPIOA_BASEADDR)
 #define GPIOB		((Gpio_RegDef_t*)GPIOB_BASEADDR)
@@ -124,6 +125,7 @@ typedef struct { //with offset addr of each
 
 /*
  * peripheral definition register map for RCC
+ * BUS AHB4
  */
 
 #define RCC_CR		(uint32_t *)(RCC_BASEADDR + 0x00)
@@ -222,9 +224,106 @@ typedef struct { //with offset addr of each
 
 /*
  * EXTI register definition
+ * BUS APB4 0X58000000
  */
+typedef struct {
+	__vo uint32_t RTSR1; //0x00
+	__vo uint32_t FTSR1; //0x04
+	__vo uint32_t SWIER1; //0x08
+	__vo uint32_t D3PMR1; //0x0C
+	__vo uint32_t D3PCR1L; //0x10
+	__vo uint32_t D3PCR1H; //0x14
+	__vo uint32_t RESERVED1; //0x18
+	__vo uint32_t RESERVED2; //0x1C
+	__vo uint32_t RTSR2; //0x20
+	__vo uint32_t FTSR2; //0x24
+	__vo uint32_t SWIER2; //0x28
+	__vo uint32_t D3PMR2; //0x2C
+	__vo uint32_t D3PCR2L; //0x30
+	__vo uint32_t D3PCR2H; //0x34
+	__vo uint32_t RESERVED3; //0x38
+	__vo uint32_t RESERVED4; //0x3C
+	__vo uint32_t RTSR3; //0x40
+	__vo uint32_t FTSR3; //0x44
+	__vo uint32_t SWIER3; //0x48
+	__vo uint32_t D3PMR3; //0x4C
+	__vo uint32_t D3PCR3L; //0x50
+	__vo uint32_t D3PCR3H; //0x54
+	uint32_t RESERVED5[10];
+	//uint32_t RESERVED5; //0x58
+	//__vo uint32_t RESERVED6; //0x5C
+	//__vo uint32_t RESERVED7; //0x60
+	//__vo uint32_t RESERVED8; //0x64
+	//__vo uint32_t RESERVED9; //0x68
+	//__vo uint32_t RESERVED10; //0x6C
+	//__vo uint32_t RESERVED11; //0x70
+	//__vo uint32_t RESERVED12; //0x74
+	//__vo uint32_t RESERVED13; //0x78
+	//uint32_t RESERVED14; //0x7C
+	__vo uint32_t C1IMR1; //0x80
+	__vo uint32_t C1EMR1; //0x84
+	__vo uint32_t C1PR1; //0x88
+	uint32_t RESERVED15; //0x8C
+	__vo uint32_t C1IMR2; //0x90
+	__vo uint32_t C1EMR2; //0x94
+	__vo uint32_t C1PR2; //0x98
+	uint32_t RESERVED16; //0x9C
+	__vo uint32_t C1IMR3; //0xA0
+	__vo uint32_t C1EMR3; //0xA4
+	__vo uint32_t C1PR3; //0xA8
+	uint32_t RESERVED17[5];
+	//__vo uint32_t RESERVED17; //0xAC
+	//__vo uint32_t RESERVED18; //0xB0
+	//__vo uint32_t RESERVED19; //0xB4
+	//__vo uint32_t RESERVED20; //0xB8
+	//__vo uint32_t RESERVED21; //0xBC
+	__vo uint32_t C2IMR1; //0xC0
+	__vo uint32_t C2EMR1; //0xC4
+	__vo uint32_t C2PR1; //0xC8
+	uint32_t RESERVED22; //0xCC
+	__vo uint32_t C2IMR2; //0xD0
+	__vo uint32_t C2EMR2; //0xD4
+	__vo uint32_t C2PR2; //0xD8
+	uint32_t RESERVED23; //0xDC
+	__vo uint32_t C2IMR3; //0xE0
+	__vo uint32_t C2EMR3; //0xE4
+	__vo uint32_t C2PR3; //0xE8
+	//__vo uint32_t RESERVED22; //0xEC
+}Exti_RegDef_t ;
+#define EXTI	((Exti_RegDef_t*)EXTI_BASEADDR)
 
-#define RCC_AHB4ENR		(uint32_t *)(RCC_BASEADDR + 0x0e0)
+/*
+ * Define System Config Register
+ */
+#define SYSCFG				SYSCFG_BASEADDR
+#define SYSCFG_PMCR		((uint32_t*)SYSCFG + 0x04)
+#define SYSCFG_EXTICR1		((uint32_t*)SYSCFG + 0x08)
+#define SYSCFG_EXTICR2		((uint32_t*)SYSCFG + 0x0C)
+#define SYSCFG_EXTICR3		((uint32_t*)SYSCFG + 0x10)
+#define SYSCFG_EXTICR4		((uint32_t*)SYSCFG + 0x14)
+#define SYSCFG_CFGR		((uint32_t*)SYSCFG + 0x18)
+#define SYSCFG_CCCSR		((uint32_t*)SYSCFG + 0x20)
+#define SYSCFG_CCVR		((uint32_t*)SYSCFG + 0x24)
+#define SYSCFG_CCCR		((uint32_t*)SYSCFG + 0x28)
+#define SYSCFG_PKGR		((uint32_t*)SYSCFG + 0x124)
+#define SYSCFG_UR0		((uint32_t*)SYSCFG + 0x300)
+#define SYSCFG_UR1		((uint32_t*)SYSCFG + 0x304)
+#define SYSCFG_UR2		((uint32_t*)SYSCFG + 0x308)
+#define SYSCFG_UR3		((uint32_t*)SYSCFG + 0x30C)
+#define SYSCFG_UR4		((uint32_t*)SYSCFG + 0x310)
+#define SYSCFG_UR5		((uint32_t*)SYSCFG + 0x314)
+#define SYSCFG_UR6		((uint32_t*)SYSCFG + 0x318)
+#define SYSCFG_UR7		((uint32_t*)SYSCFG + 0x31C)
+#define SYSCFG_UR8		((uint32_t*)SYSCFG + 0x320)
+#define SYSCFG_UR9		((uint32_t*)SYSCFG + 0x324)
+#define SYSCFG_UR10		((uint32_t*)SYSCFG + 0x328)
+#define SYSCFG_UR11		((uint32_t*)SYSCFG + 0x32C)
+#define SYSCFG_UR12	((uint32_t*)SYSCFG + 0x330)
+#define SYSCFG_UR13		((uint32_t*)SYSCFG + 0x334)
+#define SYSCFG_UR14		((uint32_t*)SYSCFG + 0x338)
+#define SYSCFG_UR15		((uint32_t*)SYSCFG + 0x33C)
+#define SYSCFG_UR16		((uint32_t*)SYSCFG + 0x340)
+#define SYSCFG_UR17		((uint32_t*)SYSCFG + 0x344)
 /*
  * Clock enable macro for gpiox aka clock enable for bus that this peri hangs on
  */
