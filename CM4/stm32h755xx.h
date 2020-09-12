@@ -12,6 +12,78 @@
 
 #define	__vo	volatile
 
+/*
+ * Define NVIC Register
+ */
+// Interrupt Set Enable
+#define NVIC_ISER0	((__vo uint32_t*)0xe000e100)
+#define NVIC_ISER1	((__vo uint32_t*)0xe000e104)
+#define NVIC_ISER2	((__vo uint32_t*)0xe000e108)
+#define NVIC_ISER3	((__vo uint32_t*)0xe000e10c)
+#define NVIC_ISER4	((__vo uint32_t*)0xe000e110)
+#define NVIC_ISER5	((__vo uint32_t*)0xe000e114)
+#define NVIC_ISER6	((__vo uint32_t*)0xe000e118)
+#define NVIC_ISER7	((__vo uint32_t*)0xe000e11c)
+
+// Interrupt Clear Enable
+#define NVIC_ICER0	((__vo uint32_t*)0xe000e180)
+#define NVIC_ICER1	((__vo uint32_t*)0xe000e184)
+#define NVIC_ICER2	((__vo uint32_t*)0xe000e188)
+#define NVIC_ICER3	((__vo uint32_t*)0xe000e18c)
+#define NVIC_ICER4	((__vo uint32_t*)0xe000e190)
+#define NVIC_ICER5	((__vo uint32_t*)0xe000e194)
+#define NVIC_ICER6	((__vo uint32_t*)0xe000e198)
+#define NVIC_ICER7	((__vo uint32_t*)0xe000e19c)
+
+//Interrupt Set Pending
+#define NVIC_ISPR0	((__vo uint32_t*)0xe000e200)
+#define NVIC_ISPR1	((__vo uint32_t*)0xe000e204)
+#define NVIC_ISPR2	((__vo uint32_t*)0xe000e208)
+#define NVIC_ISPR3	((__vo uint32_t*)0xe000e20c)
+#define NVIC_ISPR4	((__vo uint32_t*)0xe000e210)
+#define NVIC_ISPR5	((__vo uint32_t*)0xe000e214)
+#define NVIC_ISPR6	((__vo uint32_t*)0xe000e218)
+#define NVIC_ISPR7	((__vo uint32_t*)0xe000e21c)
+
+//Interrupt Clear Pending
+#define NVIC_ICPR0	((__vo uint32_t*)0xe000e280)
+#define NVIC_ICPR1	((__vo uint32_t*)0xe000e284)
+#define NVIC_ICPR2	((__vo uint32_t*)0xe000e288)
+#define NVIC_ICPR3	((__vo uint32_t*)0xe000e28c)
+#define NVIC_ICPR4	((__vo uint32_t*)0xe000e290)
+#define NVIC_ICPR5	((__vo uint32_t*)0xe000e294)
+#define NVIC_ICPR6	((__vo uint32_t*)0xe000e298)
+#define NVIC_ICPR7	((__vo uint32_t*)0xe000e29c)
+
+//Interrupt Active Bit
+#define NVIC_IABR0	((__vo uint32_t*)0xe000e300)
+#define NVIC_IABR1	((__vo uint32_t*)0xe000e304)
+#define NVIC_IABR2	((__vo uint32_t*)0xe000e308)
+#define NVIC_IABR3	((__vo uint32_t*)0xe000e30c)
+#define NVIC_IABR4	((__vo uint32_t*)0xe000e310)
+#define NVIC_IABR5	((__vo uint32_t*)0xe000e314)
+#define NVIC_IABR6	((__vo uint32_t*)0xe000e318)
+#define NVIC_IABR7	((__vo uint32_t*)0xe000e31c)
+
+//Interrupt Priority
+/*
+ *	stm32h755ziq has 150 irq numbers or 150 interrupts
+ *	so need to have 150 IPRs
+ *	1 IPR can set priority number for 4 interrupts
+ */
+
+typedef struct {
+	__vo uint32_t IPR[60];
+}Ipr_t;
+
+#define Ipr_BaseAddr	0xe000e400U
+#define Ipr		((Ipr_t*)Ipr_BaseAddr)
+
+
+//Software Trigger Interrupt
+#define STIR	((__vo uint32_t*)0xe000ef00)
+
+#define NO_PRI_BITS_IMPLEMENTED		4
 
 /*
  * Base address of flash and sram in memory

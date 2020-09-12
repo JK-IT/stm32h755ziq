@@ -109,7 +109,9 @@ void Gpio_WriteToOutputPort(Gpio_RegDef_t* pGpiox, uint16_t val);
 void Gpio_TogglePin(Gpio_RegDef_t* pGpiox, uint8_t pinNum);
 
 //============
-void Gpio_IrqConfig(uint8_t IrqNum, uint8_t IrqPriority, uint8_t EnorDi);
+void Gpio_IrqConfig(uint8_t IrqNum, uint8_t EnorDi);
+
+void Gpio_SetIpr(uint8_t IrqNum, uint32_t IprNum);
 
 void Gpio_IrqHandling(uint8_t pinNum);
 
