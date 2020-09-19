@@ -209,6 +209,37 @@ typedef struct { //with offset addr of each
 													(x == GPIOI) ? 8 : \
 													(x == GPIOJ) ? 9 : \
 													(x == GPIOK) ? 10 : 0 )
+
+/*
+ * Define SPI peripheral Register and configuration type
+ */
+
+typedef struct {
+	__vo uint32_t SPI2S_CR1; //0X00
+	__vo uint32_t SPI_CR2; //0X04
+	__vo uint32_t SPI_CFG1; //0X08
+	__vo uint32_t SPI_CFG2; //0X0C
+	__vo uint32_t SPI2S_IER; //0X10
+	__vo uint32_t SPI2S_SR; //0X14
+	__vo uint32_t SPI2S_IFCR; //0X18
+	__vo uint32_t SPI2S_TXDR; //0X20
+	__vo uint32_t RESERVED[3]; //0X24-0X2C
+	__vo uint32_t RXDR; //0X30
+	__vo uint32_t RESERVED1[3]; //0X34-0X3C
+	__vo uint32_t SPI_CRCPOLY; //0X40
+	__vo uint32_t SPI_TXCRC; //0X44
+	__vo uint32_t SPI_RXCRC; //0X48
+	__vo uint32_t SPI_UDRDR; //0X4C
+	__vo uint32_t SPI_I2SCFGR; //0X50
+}Spi_RegDef_t;
+
+#define SPI1	((Spi_RegDef_t*)SPI1_BASEADDR)
+#define SPI2	((Spi_RegDef_t*)SPI2_BASEADDR)
+#define SPI3	((Spi_RegDef_t*)SPI3_BASEADDR)
+#define SPI4	((Spi_RegDef_t*)SPI4_BASEADDR)
+#define SPI5	((Spi_RegDef_t*)SPI5_BASEADDR)
+#define SPI6	((Spi_RegDef_t*)SPI6_BASEADDR)
+
 /*
  * peripheral definition register map for RCC
  * BUS AHB4
@@ -522,6 +553,7 @@ typedef struct {
 #define		GPIOK_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<10)); (*(RCC_AHB4RSTR) &= ~(1<<10)); }while(0)
 
 
+
 //some generic macros
 #define ENABLE 		0x1
 #define DISABLE		0x0
@@ -531,5 +563,6 @@ typedef struct {
 #define GPIO_PIN_RESET	RESET
 
 #include "gpio_driver.h"
+#include "spi_driver.h"
 
 #endif /* INC_STM32H755XX_H_ */
