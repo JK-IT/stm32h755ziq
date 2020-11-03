@@ -19,18 +19,21 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 	//enable sys config peripheral clock
 	SYSCFG_PCLK_EN();
 
+	//enable peripheral clock on that gpio
+	Gpio_PeriClkControl(pGpioHandle->pGpiox, ENABLE);
+
 	//1. gpio mode
 	if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode <= GPIO_MODE_ANALOG)
 	{
-		temp = (pGpioHandle->Gpio_PinConfig.Gpio_PinMode << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
-		pGpioHandle->pGpiox->Moder &= ~(0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
+		temp = ((uint32_t)pGpioHandle->Gpio_PinConfig.Gpio_PinMode << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
+		pGpioHandle->pGpiox->Moder &= ~((uint32_t)0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
 		pGpioHandle->pGpiox->Moder |= temp; //set bit
 		temp = 0;
 	} else //extended interrupt  = detects rising/ falling edge of peri/input event
 	{
 		// enable pin as input mode but also trigger interrupt
 		// at reset all pin is set in analog mode
-		pGpioHandle->pGpiox->Moder &= ~(0x3 << (2 * pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
+		pGpioHandle->pGpiox->Moder &= ~((uint32_t)0x3 << (2 * pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
 
 		if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_FT)
 		{
@@ -66,19 +69,19 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 	temp = 0;
 	//2. speed
 	temp = (pGpioHandle->Gpio_PinConfig.Gpio_PinSpeed << (2 * pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
-	pGpioHandle->pGpiox->Ospeedr &= ~(0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
+	pGpioHandle->pGpiox->Ospeedr &= ~((uint32_t)0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
 	pGpioHandle->pGpiox->Ospeedr |= temp;
 
 	temp = 0;
 	//3. pupd register
 	temp = (pGpioHandle->Gpio_PinConfig.Gpio_PinPuPdControl << (2 * pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
-	pGpioHandle->pGpiox->Pupdr &= ~(0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
+	pGpioHandle->pGpiox->Pupdr &= ~((uint32_t)0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
 	pGpioHandle->pGpiox->Pupdr |= temp;
 
 	temp = 0;
 	//4.output type
 	temp = (pGpioHandle->Gpio_PinConfig.Gpio_PinOPType << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-	pGpioHandle->pGpiox->Otyper &= ~(0x3 << (pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
+	pGpioHandle->pGpiox->Otyper &= ~((uint32_t)0x3 << (pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
 	pGpioHandle->pGpiox->Otyper |= temp;
 
 	temp =0;

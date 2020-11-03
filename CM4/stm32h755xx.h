@@ -222,10 +222,11 @@ typedef struct {
 	__vo uint32_t SPI2S_IER; //0X10
 	__vo uint32_t SPI2S_SR; //0X14
 	__vo uint32_t SPI2S_IFCR; //0X18
+	__vo uint32_t RESERVED0; //0x1C
 	__vo uint32_t SPI2S_TXDR; //0X20
-	__vo uint32_t RESERVED[3]; //0X24-0X2C
-	__vo uint32_t RXDR; //0X30
-	__vo uint32_t RESERVED1[3]; //0X34-0X3C
+	__vo uint32_t RESERVED1[3]; //0X24-0X2C
+	__vo uint32_t SPI2S_RXDR; //0X30
+	__vo uint32_t RESERVED2[3]; //0X34-0X3C
 	__vo uint32_t SPI_CRCPOLY; //0X40
 	__vo uint32_t SPI_TXCRC; //0X44
 	__vo uint32_t SPI_RXCRC; //0X48
@@ -552,7 +553,15 @@ typedef struct {
 #define		GPIOJ_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<9)); (*(RCC_AHB4RSTR) &= ~(1<<9)); }while(0)
 #define		GPIOK_REG_RST()		do{ (*(RCC_AHB4RSTR) |= (1<<10)); (*(RCC_AHB4RSTR) &= ~(1<<10)); }while(0)
 
-
+/*
+ * RESET SPI MACRO
+ */
+#define		SPI1_REG_RST()			do{ ( *(RCC_APB2RSTR) |= (1 << 12)); ( *(RCC_APB2RSTR) &= ~(1 << 12)); }while(0)
+#define		SPI2_REG_RST()			do{ ( *(RCC_APB1LRSTR) |= (1 << 14)); ( *(RCC_APB1LRSTR) &= ~(1 << 14)); }while(0)
+#define		SPI3_REG_RST()			do{ ( *(RCC_APB1LRSTR) |= (1 << 15)); ( *(RCC_APB1LRSTR) &= ~(1 << 15)); }while(0)
+#define		SPI4_REG_RST()			do{ ( *(RCC_APB2RSTR) |= (1 << 13)); ( *(RCC_APB2RSTR) &= ~(1 << 13)); }while(0)
+#define		SPI5_REG_RST()			do{ ( *(RCC_APB2RSTR) |= (1 << 20)); ( *(RCC_APB2RSTR) &= ~(1 << 20)); }while(0)
+#define		SPI6_REG_RST()			do{ ( *(RCC_APB4RSTR) |= (1 << 5)); ( *(RCC_APB4RSTR) &= ~(1 << 5)); }while(0)
 
 //some generic macros
 #define ENABLE 		0x1
@@ -561,6 +570,8 @@ typedef struct {
 #define RESET		DISABLE
 #define GPIO_PIN_SET	SET
 #define GPIO_PIN_RESET	RESET
+#define FLAG_SET		SET
+#define FLAG_RESET		RESET
 
 #include "gpio_driver.h"
 #include "spi_driver.h"
