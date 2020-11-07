@@ -29,7 +29,7 @@
 #define SPI_SCLK_SPEED_DIV32			4
 #define SPI_SCLK_SPEED_DIV64			5
 #define SPI_SCLK_SPEED_DIV128			6
-#define SPI_SCLK_SPEED_DIV2256		7
+#define SPI_SCLK_SPEED_DIV256		7
 
 #define SPI_DSIZE_XBITS(x)	((x < 5) ? 3 : (x -1))
 #define SPI_DFF_MSB	0	// most significant bit goes first
@@ -47,11 +47,13 @@
 
 	//flag of status register
 	// shift by the bit position in register
-#define SPI_STAT_TXP	(1 << 1)	//txfifo space available
-#define SPI_STAT_RXP	(1 << 0) //rxfifo space available
-#define SPI_STAT_EOT 	(1 << 3) // end of transfer
-#define SPI_STAT_TXC 	(1 << 12) // TRANSMISSION COMPLETE
-#define SPI_STAT_MODF 	(1 << 9) // MODE FAULT
+#define SPI_STAT_TXP			(1 << 1)	//txfifo space available
+#define SPI_STAT_RXP			(1 << 0) //rxfifo space available
+#define SPI_STAT_RXWNE	(1 << 15) //rx word not empty space available
+#define SPI_STAT_RXPLVL	(1 << 13) //rx packed frames available space available
+#define SPI_STAT_EOT 		(1 << 3) // end of transfer
+#define SPI_STAT_TXC 		(1 << 12) // TRANSMISSION COMPLETE
+#define SPI_STAT_MODF 		(1 << 9) // MODE FAULT
 
 
 	//SSI SIGNAL

@@ -91,6 +91,10 @@ void Spi_Init(Spi_Handle_t * pSpiHandle, uint8_t masOnly)
 	// data size bit 4:0		of spi_cfg1
 	// bit 23 lsbfrst of spi_cfg2	----	0: msb transmitted 1st,  1: lsb transmitted 1st
 	pSpiHandle->pSpix->SPI_CFG1 |= ((uint32_t)pSpiHandle->SpiConfig.Spi_DSize) ;
+	/*if(pSpiHandle->SpiConfig.Spi_DSize < 8)
+	{
+		pSpiHandle->pSpix->SPI_CFG1 |= (1 << 5);
+	}*/
 	pSpiHandle->pSpix->SPI_CFG2 |= ((uint32_t)pSpiHandle->SpiConfig.Spi_Dff << 23);
 
 	//----5. Clock Polarity
@@ -265,21 +269,17 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 		//data size is at cfr1 , at 5:0 bit
 	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
 
-	//disable spe if it is on
-	uint8_t temp1 = pSpix->SPI2S_CR1 & 0x01;
-	if(temp1){ Spi_PerControl(SPI1, DISABLE); }
 	//configure the data size in tsize of cr2, first 16bits
 	//CAN ONLY SET IF SPE = 0 OR SPI IS DISABLED
 	// if not config, the transaction will be endless , aka EOT flag will never  be set
-	//----> this not working welll cuz after eot is set, it not working
 	pSpix->SPI_CR2 &= ~(0xff);
 	pSpix->SPI_CR2 |= (uint16_t)(len * 4);
 
 	//enable spi by enable SPE
-	Spi_PerControl(SPI1, ENABLE);
+	Spi_PerControl(pSpix, ENABLE);
 	//---START COMMUNICATION BY ENABLE CSTART BIT
 	//CAN ONLY SET IF MASTER = 1 AND SPE = 1
-	Spi_SetCstart(SPI1, ENABLE);
+	Spi_SetCstart(pSpix, ENABLE);
 
 	//writing to txdr reg will acccess tx buffer or txfifo
 	while ( len > 0 )
@@ -301,7 +301,7 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 			if(len < 2)
 			{
 				// load data as  bits
-				pSpix->SPI2S_TXDR = *(ptxBuffer);
+			    pSpix->SPI2S_TXDR = *(ptxBuffer);
 				len -= 1;
 				ptxBuffer += 1;
 			} else
@@ -326,11 +326,18 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 			}
 		}
 	}
-
+	while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_TXC));
+	while(  Spi_GetFlagStatus(pSpix, SPI_STAT_RXWNE) &  Spi_GetFlagStatus(pSpix, SPI_STAT_RXPLVL)  )
+	{
+		uint32_t dispose = pSpix->SPI2S_RXDR;
+	}
+	// without clearing the eot flag, it won't work properly
 	while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_EOT) );
 			//clear eot or txf bit
-		SPI1->SPI2S_IFCR |= (1 << 3);
-		SPI1->SPI2S_IFCR |= (1 << 4);
+		pSpix->SPI2S_IFCR |= (1 << 3);
+		pSpix->SPI2S_IFCR |= (1 << 4);
+
+	Spi_PerControl(pSpix, DISABLE);
 }
 
 void Spi_ReceiveData(Spi_RegDef_t* pSpix, uint8_t *prxBuffer, uint32_t len);

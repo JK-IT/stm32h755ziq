@@ -35,7 +35,6 @@ void Spi1_PA_Init()
 	// default clock source: pll but pll is disabled by default
 	//for easy set up use peripheral kernal clk
 	*(RCC_CR) |= (1 << 1); // enable hsi kernel clock
-	Delay();
 	Spi123_SrcClkSel(SPI123_CLK_PER);
 	// enable gpio a
 	Gpio_Handle_t gpioa;
@@ -44,7 +43,7 @@ void Spi1_PA_Init()
 	gpioa.Gpio_PinConfig.Gpio_PinAltFunMode = 5;
 	gpioa.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
 	gpioa.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_NO_PUPD;
-	gpioa.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_MED;
+	gpioa.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_LOW;
 
 		// nss pa4
 	gpioa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_4;
@@ -64,7 +63,7 @@ void Spi1_PA_Init()
 	spi1.SpiConfig.Spi_Cpol = SPI_CPOL_LOW;
 	spi1.SpiConfig.Spi_CPha = SPI_CPHA_LOW;
 	spi1.SpiConfig.Spi_DSize = SPI_DSIZE_XBITS(8);
-	spi1.SpiConfig.Spi_SclkSpeed = SPI_SCLK_SPEED_DIV8;
+	spi1.SpiConfig.Spi_SclkSpeed = SPI_SCLK_SPEED_DIV16;
 	spi1.SpiConfig.Spi_Ssm = SPI_SSM_DI;
 	spi1.SpiConfig.Spi_SsPol = SPI_SSPOL_LOW;
 	Spi_Init(&spi1, ENABLE);
@@ -86,6 +85,9 @@ void Spi6_PA_Init()
 	gpioa.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_NO_PUPD;
 	gpioa.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_FAST;
 
+	// nss pa4
+	gpioa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_4;
+	Gpio_Init(&gpioa);
 	// sck pa5
 	gpioa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_5;
 	Gpio_Init(&gpioa);
@@ -97,15 +99,15 @@ void Spi6_PA_Init()
 	spi6.pSpix = SPI6;
 	spi6.SpiConfig.Spi_BusConfig = SPI_BUS_CONFIG_FD;
 	spi6.SpiConfig.Spi_DeviceMode = SPI_DEVICE_MODE_MASTER;
-	spi6.SpiConfig.Spi_SclkSpeed = SPI_SCLK_SPEED_DIV8;
+	spi6.SpiConfig.Spi_SclkSpeed = SPI_SCLK_SPEED_DIV16;
 	spi6.SpiConfig.Spi_CPha = SPI_CPHA_LOW;
 	spi6.SpiConfig.Spi_Cpol = SPI_CPOL_LOW;
 	spi6.SpiConfig.Spi_DSize = SPI_DSIZE_XBITS(8);
 	spi6.SpiConfig.Spi_Dff = SPI_DFF_MSB;
 	spi6.SpiConfig.Spi_SsPol = SPI_SSPOL_LOW;
-	spi6.SpiConfig.Spi_Ssm = SPI_SSM_EN;
+	spi6.SpiConfig.Spi_Ssm = SPI_SSM_DI;
 
-	Spi_Init(&spi6, DISABLE);
+	Spi_Init(&spi6, ENABLE);
 }
 
 /*
@@ -128,7 +130,7 @@ void User_ButtonInit()
 
 int main(){
 
-	char messbuff[] = "wth";
+	char messbuff[] = "what the heck is going on";
 
 	User_ButtonInit();
 	//Spi6_PA_Init();
@@ -140,10 +142,8 @@ int main(){
 
 		uint8_t datlen = strlen(messbuff);
 		Spi_SendData(SPI1, &datlen , 1);
-		Spi_SendData(SPI1, (uint8_t*)messbuff, strlen(messbuff));
+		Spi_SendData(SPI1, (uint8_t *)messbuff, strlen(messbuff));
 
-		while( ! Spi_GetFlagStatus(SPI1, SPI_STAT_TXC) & ! Spi_GetFlagStatus(SPI1, SPI_STAT_EOT) );
-		Spi_PerControl(SPI1, DISABLE);
 	}
 	return 0;
 }
