@@ -1,82 +1,22 @@
 /*
- * spi_driver.c
+ * spiDriver.c
  *
- *  Created on: Sep 17, 2020
+ *  Created on: Nov 20, 2020
  *      Author: jkgra
  */
-#include "spi_driver.h"
+#include "spiDriver.h"
 
-//===== PERI CLOCK CONTROL
-/*
- * @param1[in]		Spi Peripheral
- * @param2[in]		Enable or Disable
- */
-void Spi_PeriClkControl(Spi_RegDef_t * pSpix, uint8_t EnorDi)
+/*--------------------------
+
+	**** SPI CONFIGURATION ***********
+
+-----------------------------
+*/
+
+void Spi_Cfig(Spi_Handle_t * pSpiHandle, uint8_t masOnly)
 {
-	if(EnorDi == ENABLE)
-	{
-		if(pSpix == SPI1)
-		{
-			SPI1_PCLK_EN();
-		}
-		else if(pSpix == SPI2)
-		{
-			SPI2_PCLK_EN();
-		}
-		else if(pSpix == SPI3)
-		{
-			SPI3_PCLK_EN();
-		}
-		else if (pSpix == SPI4)
-		{
-			SPI4_PCLK_EN();
-		}
-		else if (pSpix == SPI5)
-		{
-			SPI5_PCLK_EN();
-		} else
-		{
-			SPI6_PCLK_EN();
-		}
-	} else
-	{
-		if(pSpix == SPI1)
-		{
-			SPI1_PCLK_DI();
-		}
-		else if(pSpix == SPI2)
-		{
-			SPI2_PCLK_DI();
-		}
-		else if(pSpix == SPI3)
-		{
-			SPI3_PCLK_DI();
-		}
-		else if (pSpix == SPI4)
-		{
-			SPI4_PCLK_DI();
-		}
-		else if (pSpix == SPI5)
-		{
-			SPI5_PCLK_DI();
-		} else
-		{
-			SPI6_PCLK_DI();
-		}
-	}
-}
-
-void Spi123_SrcClkSel( uint8_t clkNum)
-{
-	*(RCC_D2CCIP1R) |= (clkNum << 12);
-}
-
-//===== INIT AND DEINIT
-void Spi_Init(Spi_Handle_t * pSpiHandle, uint8_t masOnly)
-{
-
-	//enable spi clock to access register
-	Spi_PeriClkControl(pSpiHandle->pSpix, ENABLE);
+	//enable spi clock and kernel clk
+	RccSpi_Init(pSpiHandle->pSpix);
 
 	//----2. bus config
 	// bit 18:17 comm of spi_cfg2
@@ -139,118 +79,20 @@ void Spi_Init(Spi_Handle_t * pSpiHandle, uint8_t masOnly)
 	//----1. device mode
 	// bit 22 master of spi_cfg2 for stm32h755xx
 	pSpiHandle->pSpix->SPI_CFG2 |= ((uint32_t)pSpiHandle->SpiConfig.Spi_DeviceMode << 22);
-
 }
-void Spi_DeInit(Spi_RegDef_t* pSpix)
+
+
+
+/*--------------------------
+
+	**** SPI RESET ***********
+
+-----------------------------
+*/
+void Spi_Reset(Spi_RegDef_t* pSpix)
 {	//using rcc to reset spi block
-	if ( pSpix == SPI1)
-	{	// bit 12 rcc_apb2rstr
-		SPI1_REG_RST();
-	}
-	else if ( pSpix == SPI2)
-	{	//bit 14 rcc_apb1lrstr
-		SPI2_REG_RST();
-	}
-	else if ( pSpix == SPI3)
-	{	//bit 15 rcc_apb1lrstr
-		SPI3_REG_RST();
-	}
-	else if ( pSpix == SPI4)
-	{	//bit 13 rcc_apb2rstr
-		SPI4_REG_RST();
-	}
-	else if ( pSpix == SPI5)
-	{	//bit 20 rcc_apb2rstr
-		SPI5_REG_RST();
-	}
-	else if ( pSpix == SPI6)
-	{	//bit 5 rcc_apb4rstr
-		SPI6_REG_RST();
-	}
+	RccSpi_Rst(pSpix);
 }
-
-/*
- * Purpose: enable port pin that will be used as spi
- * Different spiNum will have different number of pin to use on each port
- * Enable all port pin as spi if the spiNum is scattering around
- * The pin that will be used is from reference book
- */
-
-void Spi_GpioInit(Gpio_RegDef_t* inPort, uint8_t spiNum)
-{
-	if(spiNum == Spi_No_1)
-	{
-
-		// configure PORT A PIN 4 -NSS, 5-SCK, 6-MISO, 7-MOSI
-		//ALTF = 5
-		if(inPort == GPIOA)
-		{
-			Gpio_Handle_t pa;
-			pa.pGpiox = GPIOA;
-			pa.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_ALTFN;
-			pa.Gpio_PinConfig.Gpio_PinAltFunMode = 5;
-			pa.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
-			pa.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PU;
-			pa.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_MED;
-			//nss pa4
-			//pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_4;
-			//Gpio_Init(&pa);
-			//sck pa5
-			pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_5;
-			Gpio_Init(&pa);
-			//miso pa6
-			//pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_6;
-			//Gpio_Init(&pa);
-			//mosi pa7
-			pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_7;
-			Gpio_Init(&pa);
-		}
-	} else if(spiNum == Spi_No_2)
-	{
-		// will need to look up the reference manual to find out the altfn number
-		//this setup : port B, pin 12-15, altfn =5
-		if(inPort == GPIOB)
-		{
-			Gpio_Handle_t port;
-			port.pGpiox = GPIOB;
-			port.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_ALTFN;
-			port.Gpio_PinConfig.Gpio_PinAltFunMode = 5;
-			port.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
-			port.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PU;
-			port.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_MED;
-
-			// nss pin 12 port b
-			port.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_12;
-			Gpio_Init(&port);
-
-			//sck pin 13 port b
-			port.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_13;
-			Gpio_Init(&port);
-
-			//miso pin 14 port b
-			//port.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_14;
-			//Gpio_Init(&port);
-
-			//mosi pin 15 port b
-			port.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_15;
-			Gpio_Init(&port);
-		}
-
-	} else if(spiNum == Spi_No_3)
-	{
-
-	} else if(spiNum == Spi_No_4)
-	{
-
-	} else if(spiNum == Spi_No_5)
-	{
-
-	} else if(spiNum == Spi_No_6)
-	{
-
-	}
-}
-
 
 uint8_t Spi_GetFlagStatus(Spi_RegDef_t* pSpix, uint32_t flagname)
 {
@@ -261,6 +103,13 @@ uint8_t Spi_GetFlagStatus(Spi_RegDef_t* pSpix, uint32_t flagname)
 		return FLAG_RESET;
 	}
 }
+
+/*--------------------------
+
+	**** SPI SEND DATA ***********
+
+-----------------------------
+*/
 
 //===== DATA SENT FUNCTION
 void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
@@ -340,21 +189,35 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 	Spi_PerControl(pSpix, DISABLE);
 }
 
+/*--------------------------
+
+	**** SPI RECEIVE DATA ***********
+
+-----------------------------
+*/
+
 void Spi_ReceiveData(Spi_RegDef_t* pSpix, uint8_t *prxBuffer, uint32_t len);
 
 //===== 	SPI INTERRUPT CONFIG
-void Spi_IrqConfig(uint8_t IrqNum, uint8_t EnorDi);
+void Spi_IrqConfig(uint8_t IrqNum, uint8_t EnorDi){}
 
-void Spi_SetIpr(uint8_t IrqNum, uint32_t IprNum);
+void Spi_SetIpr(uint8_t IrqNum, uint32_t IprNum){}
 
-void Spi_IrqHandling(Spi_Handle_t * pSpiHandle);
+void Spi_IrqHandling(Spi_Handle_t * pSpiHandle){}
 
 //===== Other Config
+
+/*--------------------------
+
+	**** SPI ENABLE ***********
+
+-----------------------------
+*/
 	/*
 	 * Enable SPI in Spi Control Register
 	 * bit SPE = 0 of CR1
 	 */
-void Spi_PerControl(Spi_RegDef_t * pSpix, uint8_t EnorDi)
+void Spi_Toggle(Spi_RegDef_t * pSpix, uint8_t EnorDi)
 {
 	if(EnorDi == ENABLE){
 		pSpix->SPI2S_CR1 |= 1;
@@ -362,6 +225,13 @@ void Spi_PerControl(Spi_RegDef_t * pSpix, uint8_t EnorDi)
 		pSpix->SPI2S_CR1 &= ~(1);
 	}
 }
+
+/*--------------------------
+
+	**** SPI SET SSOE PIN ***********
+
+-----------------------------
+*/
 
 	/*
 	 * Enable SSOE in Spi Control Register
@@ -379,6 +249,13 @@ void Spi_SsoeConfig(Spi_RegDef_t* pSpix, uint8_t EnorDi)
 	}
 }
 
+/*--------------------------
+
+	**** SPI SET SSI PIN ***********
+
+-----------------------------
+*/
+
 void Spi_SetSsi( Spi_RegDef_t* inSpi , uint8_t EnoDi)
 {
 	if(EnoDi == ENABLE)
@@ -391,6 +268,13 @@ void Spi_SetSsi( Spi_RegDef_t* inSpi , uint8_t EnoDi)
 	}
 }
 
+/*--------------------------
+
+	**** SPI SET CSTART PIN ***********
+
+-----------------------------
+*/
+
 void Spi_SetCstart(Spi_RegDef_t* inspi, uint8_t dioren)
 {
 	if(dioren == ENABLE)
@@ -401,4 +285,3 @@ void Spi_SetCstart(Spi_RegDef_t* inspi, uint8_t dioren)
 		inspi->SPI2S_CR1 &= ~(1<< 9);
 	}
 }
-

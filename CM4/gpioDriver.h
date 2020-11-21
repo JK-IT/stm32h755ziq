@@ -1,14 +1,14 @@
 /*
- * gpio_driver.h
+ * gpioDriver.h
  *
- *  Created on: Aug 26, 2020
+ *  Created on: Nov 20, 2020
  *      Author: jkgra
  */
 
-#ifndef INC_GPIO_DRIVER_H_
-#define INC_GPIO_DRIVER_H_
+#ifndef GPIODRIVER_H_
+#define GPIODRIVER_H_
 
-#include "stm32h755xx.h"
+#include <stm32h755xx.h>
 #include "stdint.h"
 
 /*
@@ -47,12 +47,12 @@ typedef struct {
 #define GPIO_PIN_NO_7		7
 #define GPIO_PIN_NO_8		8
 #define GPIO_PIN_NO_9		9
-#define GPIO_PIN_NO_10	10
-#define GPIO_PIN_NO_11	11
-#define GPIO_PIN_NO_12	12
-#define GPIO_PIN_NO_13	13
-#define GPIO_PIN_NO_14	14
-#define GPIO_PIN_NO_15	15
+#define GPIO_PIN_NO_10		10
+#define GPIO_PIN_NO_11		11
+#define GPIO_PIN_NO_12		12
+#define GPIO_PIN_NO_13		13
+#define GPIO_PIN_NO_14		14
+#define GPIO_PIN_NO_15		15
 
 
 /*
@@ -92,7 +92,7 @@ typedef struct {
  * api supported by the drivers
  */
 void Gpio_Init(Gpio_Handle_t *pGpioHandle);
-void Gpio_DeInit(Gpio_RegDef_t* pGpiox);
+void Gpio_Reset(Gpio_RegDef_t* pGpiox);
 
 //==============
 void Gpio_PeriClkControl(Gpio_RegDef_t* pGpiox, uint8_t EnorDi);
@@ -116,6 +116,4 @@ void Gpio_SetIpr(uint8_t IrqNum, uint32_t IprNum);
 void Gpio_IrqHandling(uint8_t pinNum);
 
 
-
-
-#endif /* INC_GPIO_DRIVER_H_ */
+#endif /* GPIODRIVER_H_ */

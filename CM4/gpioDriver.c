@@ -1,12 +1,11 @@
 /*
- * gpio_driver.c
+ * gpioDriver.c
  *
- *  Created on: Aug 26, 2020
+ *  Created on: Nov 20, 2020
  *      Author: jkgra
  */
 
-
-#include "gpio_driver.h"
+#include "gpioDriver.h"
 
 /*
  * param	gpio handle structure
@@ -15,9 +14,6 @@
 void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 {
 	uint32_t temp = 0; /// temp register
-
-	//enable sys config peripheral clock
-	SYSCFG_PCLK_EN();
 
 	//enable peripheral clock on that gpio
 	Gpio_PeriClkControl(pGpioHandle->pGpiox, ENABLE);
@@ -102,44 +98,18 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 	}
 }
 
+/*--------------------------------
+ * fn	***********PERIPHERAL RESET--------------------
+ *
+ * BRIEF	this RESET GPIO BLOCK
+ * param 1		GPIO PORT
+ * return		VOID
+ * ----------------------------------
+ */
 
-
-void Gpio_DeInit(Gpio_RegDef_t* pGpiox)
+void Gpio_Reset(Gpio_RegDef_t* pGpiox)
 {
-	if(pGpiox == GPIOA){
-		GPIOA_REG_RST();
-	}
-	else if(pGpiox == GPIOB){
-		GPIOB_REG_RST();
-	}
-	else if(pGpiox == GPIOC){
-			GPIOC_REG_RST();
-	}
-	else if(pGpiox == GPIOD){
-			GPIOD_REG_RST();
-	}
-	else if(pGpiox == GPIOE){
-			GPIOE_REG_RST();
-		}
-	else if(pGpiox == GPIOF){
-			GPIOF_REG_RST();
-		}
-	else if(pGpiox == GPIOG){
-			GPIOG_REG_RST();
-		}
-	else if(pGpiox == GPIOH){
-			GPIOH_REG_RST();
-		}
-	else if(pGpiox == GPIOI){
-			GPIOI_REG_RST();
-		}
-	else if(pGpiox == GPIOJ){
-			GPIOJ_REG_RST();
-		}
-	else if(pGpiox == GPIOK){
-			GPIOK_REG_RST();
-		}
-
+	RccGpio_Rst(pGpiox);
 }
 
 //==============
@@ -153,83 +123,9 @@ void Gpio_DeInit(Gpio_RegDef_t* pGpiox)
  *
  * return		VOID
  */
-void Gpio_PeriClkControl(Gpio_RegDef_t* pGpiox, uint8_t EnorDi){
-
-	if(EnorDi == ENABLE)
-	{
-		if(pGpiox == GPIOA){
-			GPIOA_PCLK_EN();
-		}
-		else if(pGpiox == GPIOB){
-			//GPIOB_PCLK_EN();
-			//uint32_t val = 0x1 << 1;
-			//uint32_t reg = RCC->Ahb4Enr;
-			//(RCC->Ahb4Enr |= (0x1 << 1));
-			GPIOB_PCLK_EN();
-		}
-		else if(pGpiox == GPIOC){
-			GPIOC_PCLK_EN();
-		}
-		else if(pGpiox == GPIOD){
-			GPIOD_PCLK_EN();
-		}
-		else if(pGpiox == GPIOE){
-			GPIOE_PCLK_EN();
-		}
-		else if(pGpiox == GPIOF){
-			GPIOF_PCLK_EN();
-		}
-		else if(pGpiox == GPIOG){
-			GPIOG_PCLK_EN();
-		}
-		else if(pGpiox == GPIOH){
-			GPIOH_PCLK_EN();
-		}
-		else if(pGpiox == GPIOI){
-			GPIOI_PCLK_EN();
-		}
-		else if(pGpiox == GPIOJ){
-			GPIOJ_PCLK_EN();
-		}
-		else if(pGpiox == GPIOK){
-			GPIOK_PCLK_EN();
-		}
-	} else {
-		if(pGpiox == GPIOA){
-			GPIOA_PCLK_DI();
-		}
-		else if(pGpiox == GPIOB){
-			GPIOB_PCLK_DI();
-		}
-		else if(pGpiox == GPIOC){
-			GPIOC_PCLK_DI();
-		}
-		else if(pGpiox == GPIOD){
-			GPIOD_PCLK_DI();
-		}
-		else if(pGpiox == GPIOE){
-			GPIOE_PCLK_DI();
-		}
-		else if(pGpiox == GPIOF){
-			GPIOF_PCLK_DI();
-		}
-		else if(pGpiox == GPIOG){
-			GPIOG_PCLK_DI();
-		}
-		else if(pGpiox == GPIOH){
-			GPIOH_PCLK_DI();
-		}
-		else if(pGpiox == GPIOI){
-			GPIOI_PCLK_DI();
-		}
-		else if(pGpiox == GPIOJ){
-			GPIOJ_PCLK_DI();
-		}
-		else if(pGpiox == GPIOK){
-			GPIOK_PCLK_DI();
-		}
-	}
-
+void Gpio_PeriClkControl(Gpio_RegDef_t* pGpiox, uint8_t EnorDi)
+{
+	RccGpio_ClkCon(pGpiox, EnorDi);
 }
 
 //==============
@@ -393,7 +289,7 @@ void Gpio_SetIpr(uint8_t IrqNum, uint32_t IprNum)
 	uint8_t iprreg = IrqNum / 4;
 	uint8_t iprpos = IrqNum % 4;
 	uint8_t shift_amount = (8 * iprpos) + (8 - NO_PRI_BITS_IMPLEMENTED);
-	Ipr->IPR[iprreg] |= (IprNum << (shift_amount));
+	IPR->IprTab[iprreg] |= (IprNum << (shift_amount));
 }
 
 

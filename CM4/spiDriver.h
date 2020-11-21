@@ -1,12 +1,12 @@
 /*
- * spi_driver.h
+ * spiDriver.h
  *
- *  Created on: Sep 17, 2020
+ *  Created on: Nov 20, 2020
  *      Author: jkgra
  */
 
-#ifndef SPI_DRIVER_H_
-#define SPI_DRIVER_H_
+#ifndef SPIDRIVER_H_
+#define SPIDRIVER_H_
 
 #include "stm32h755xx.h"
 
@@ -109,15 +109,11 @@ typedef struct
  * Spi Api	Definition
  */
 
-//===== PERI CLOCK CONTROL
-void Spi_PeriClkControl(Spi_RegDef_t * pSpix, uint8_t EnorDi);
-void Spi123_SrcClkSel( uint8_t clkNum);
 
 //===== INIT AND DEINIT
-void Spi_Init(Spi_Handle_t * pSpiHandle, uint8_t masOnly);
-void Spi_DeInit(Spi_RegDef_t* pSpix);
+void Spi_Cfig(Spi_Handle_t * pSpiHandle, uint8_t masOnly);
+void Spi_Reset(Spi_RegDef_t* pSpix);
 
-void Spi_GpioInit(Gpio_RegDef_t* inPort, uint8_t spiNum);
 
 //===== DATA SENT AND RECEIVE
 void Spi_SendData(Spi_RegDef_t* pSpiHandle, uint8_t *ptxBuffer, uint32_t len);
@@ -131,10 +127,10 @@ void Spi_SetIpr(uint8_t IrqNum, uint32_t IprNum);
 void Spi_IrqHandling(Spi_Handle_t * pSpiHandle);
 
 //===== SPI OTHER CONFIG
-void Spi_PerControl(Spi_RegDef_t * pSpix, uint8_t EnorDi);
+void Spi_Toggle(Spi_RegDef_t * pSpix, uint8_t EnorDi);
 void Spi_SsoeConfig(Spi_RegDef_t* pSpix, uint8_t EnorDi);
 void Spi_SetSsi( Spi_RegDef_t* inSpi , uint8_t EnoDi);
 void Spi_SetCstart(Spi_RegDef_t* inspi, uint8_t dioren);
 uint8_t Spi_GetFlagStatus(Spi_RegDef_t* pSpix, uint32_t flagname);
 
-#endif /* SPI_DRIVER_H_ */
+#endif /* SPIDRIVER_H_ */

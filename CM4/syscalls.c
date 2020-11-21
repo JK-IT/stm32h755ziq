@@ -43,6 +43,32 @@ register char * stack_ptr asm("sp");
 char *__env[1] = { 0 };
 char **environ = __env;
 
+/*
+ * 	Debug exception and monitor base address
+ * 	Custom printf func
+ *
+ */
+#define DEMCR		*( (volatile uint32_t*)0xE000EDFC)
+
+#define ITMPORT3		*( (volatile uint32_t*) 0xE000000C)
+#define ITMTRACE_EN		*( (volatile uint32_t*) 0xE0000E00)
+#define ITMTRACE_PRIV	*( (volatile uint32_t*) 0xE0000E40)
+#define ITMTRACE_CR		*( (volatile uint32_t*) 0xE0000E80) //set before itm stimulus and trace enable
+
+void Itm_SendChar(uint8_t ch)
+{
+	DEMCR |= (1 << 24); //global enable itm and dwt
+	ITMTRACE_CR |= (1 << 0); //enable itm
+	ITMTRACE_PRIV |= (1 << 0); //enable unpriviledge access to port 0- 7 and byte 0 of trace enable reg
+	ITMTRACE_EN |= ( 1 << 3); 	//enable port 3
+
+	//read port if return 1 --> not full
+	while ( ! (ITMPORT3) & 0x1);
+	//write
+	ITMPORT3 = ch;
+}
+
+
 
 /* Functions */
 void initialise_monitor_handles()
@@ -84,7 +110,8 @@ __attribute__((weak)) int _write(int file, char *ptr, int len)
 
 	for (DataIdx = 0; DataIdx < len; DataIdx++)
 	{
-		__io_putchar(*ptr++);
+		//__io_putchar(*ptr++);
+		Itm_SendChar(*ptr++);
 	}
 	return len;
 }
