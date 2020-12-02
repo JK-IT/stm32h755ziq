@@ -29,12 +29,9 @@ void Spi_Cfig(Spi_Handle_t * pSpiHandle, uint8_t masOnly)
 
 	//----4. data frame format - data size
 	// data size bit 4:0		of spi_cfg1
-	// bit 23 lsbfrst of spi_cfg2	----	0: msb transmitted 1st,  1: lsb transmitted 1st
 	pSpiHandle->pSpix->SPI_CFG1 |= ((uint32_t)pSpiHandle->SpiConfig.Spi_DSize) ;
-	/*if(pSpiHandle->SpiConfig.Spi_DSize < 8)
-	{
-		pSpiHandle->pSpix->SPI_CFG1 |= (1 << 5);
-	}*/
+	//---- SERIAL DATA FORMAT
+	// bit 23 lsbfrst of spi_cfg2	----	0: msb transmitted 1st,  1: lsb transmitted 1st
 	pSpiHandle->pSpix->SPI_CFG2 |= ((uint32_t)pSpiHandle->SpiConfig.Spi_Dff << 23);
 
 	//----5. Clock Polarity
@@ -75,7 +72,6 @@ void Spi_Cfig(Spi_Handle_t * pSpiHandle, uint8_t masOnly)
 		}
 
 	}
-
 	//----1. device mode
 	// bit 22 master of spi_cfg2 for stm32h755xx
 	pSpiHandle->pSpix->SPI_CFG2 |= ((uint32_t)pSpiHandle->SpiConfig.Spi_DeviceMode << 22);
@@ -122,10 +118,10 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 	//CAN ONLY SET IF SPE = 0 OR SPI IS DISABLED
 	// if not config, the transaction will be endless , aka EOT flag will never  be set
 	pSpix->SPI_CR2 &= ~(0xff);
-	pSpix->SPI_CR2 |= (uint16_t)(len * 4);
+	pSpix->SPI_CR2 |= len;
 
 	//enable spi by enable SPE
-	Spi_PerControl(pSpix, ENABLE);
+	Spi_Toggle(pSpix, ENABLE);
 	//---START COMMUNICATION BY ENABLE CSTART BIT
 	//CAN ONLY SET IF MASTER = 1 AND SPE = 1
 	Spi_SetCstart(pSpix, ENABLE);
@@ -141,7 +137,7 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 		if( datsize < 8 )
 		{
 			// load data as 8 bits
-			pSpix->SPI2S_TXDR = *( ptxBuffer);
+			*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = *( ptxBuffer);
 			len--;
 			ptxBuffer++;
 		}
@@ -150,32 +146,54 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 			if(len < 2)
 			{
 				// load data as  bits
-			    pSpix->SPI2S_TXDR = *(ptxBuffer);
+			    *((uint16_t*)&(pSpix->SPI2S_TXDR)) = *(ptxBuffer);
 				len -= 1;
 				ptxBuffer += 1;
 			} else
 			{
 				// load data as 16 bits
-				pSpix->SPI2S_TXDR = *((uint16_t*) ptxBuffer);
-				len -= 2;
+				*((uint16_t*)&(pSpix->SPI2S_TXDR)) = *((uint16_t*)ptxBuffer);
 				ptxBuffer +=2;
+				len -=2;
 			}
 		} else if ( (datsize) >=16 && (datsize) < 32 )
 		{
-			//load data as 32 bits
-			pSpix->SPI2S_TXDR = *((uint32_t*) ptxBuffer);
 			if( len < 4)
 			{
-				ptxBuffer += len;
-				len = 0;
-			} else
+				uint32_t temda = 0;
+				switch (len)
+				{
+					case 3:
+						temda = (uint32_t)(*ptxBuffer);
+						temda |= ((uint32_t)(*++ptxBuffer)) << 8;
+						temda |= ((uint32_t)(*++ptxBuffer)) << 16;
+						*((uint32_t*)&(pSpix->SPI2S_TXDR)) = temda;
+						len -=3;
+						ptxBuffer += 1;
+						break;
+					case 2:
+						*((uint32_t*)&(pSpix->SPI2S_TXDR)) = *((uint16_t*)ptxBuffer);
+						len -=2;
+						ptxBuffer += 2;
+						break;
+					case 1:
+						*((uint32_t*)&(pSpix->SPI2S_TXDR)) = *(ptxBuffer);
+						len -=1;
+						ptxBuffer += 1;
+						break;
+					default:
+						break;
+					}
+			} else 
 			{
+				//load data as 32 bits
+				*((uint32_t*)&(pSpix->SPI2S_TXDR)) = *((uint32_t*)ptxBuffer);
 				len -= 4;
-				ptxBuffer += 4;
+				ptxBuffer +=- 4;
 			}
 		}
 	}
-	while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_TXC));
+	//while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_TXC));
 	while(  Spi_GetFlagStatus(pSpix, SPI_STAT_RXWNE) &  Spi_GetFlagStatus(pSpix, SPI_STAT_RXPLVL)  )
 	{
 		uint32_t dispose = pSpix->SPI2S_RXDR;
@@ -183,10 +201,10 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 	// without clearing the eot flag, it won't work properly
 	while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_EOT) );
 			//clear eot or txf bit
-		pSpix->SPI2S_IFCR |= (1 << 3);
-		pSpix->SPI2S_IFCR |= (1 << 4);
+	pSpix->SPI2S_IFCR |= (1 << 3);
+	pSpix->SPI2S_IFCR |= (1 << 4);
 
-	Spi_PerControl(pSpix, DISABLE);
+	Spi_Toggle(pSpix, DISABLE);
 }
 
 /*--------------------------
@@ -196,7 +214,29 @@ void Spi_SendData(Spi_RegDef_t* pSpix ,uint8_t *ptxBuffer, uint32_t len)
 -----------------------------
 */
 
-void Spi_ReceiveData(Spi_RegDef_t* pSpix, uint8_t *prxBuffer, uint32_t len);
+void Spi_ReceiveData(Spi_RegDef_t* pSpix, uint8_t *prxBuffer, uint32_t len)
+{
+	//check dat size
+	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
+	while (len > 0)
+	{
+		//wait till buffer is non empty
+		while ( ! Spi_GetFlagStatus(pSpix, SPI_STAT_RXP));
+		if(datsize < 8)
+		{
+			*prxBuffer = *( (uint8_t*)&pSpix->SPI2S_RXDR);
+			len--;
+		}
+		else if(datsize < 16 && datsize >=8)
+		{
+			*((uint16_t*)prxBuffer) = *( (uint16_t*)&pSpix->SPI2S_RXDR);
+		}
+		else if(datsize < 32 && datsize >=16)
+		{
+			*((uint32_t*)prxBuffer) = pSpix->SPI2S_RXDR;
+		}
+	}
+}
 
 //===== 	SPI INTERRUPT CONFIG
 void Spi_IrqConfig(uint8_t IrqNum, uint8_t EnorDi){}

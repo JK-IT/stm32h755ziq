@@ -72,12 +72,6 @@
 #define SPI_SSPOL_LOW		0
 #define SPI_SSPOL_HIGH		1
 
-	//SPI123 SRC CLK
-#define SPI123_CLK_PLL1Q		0
-#define SPI123_CLK_PLL2P		1
-#define SPI123_CLK_PLL3P		2
-#define SPI123_CLK_CKIN		3	// external clk in from a pin
-#define SPI123_CLK_PER		4	// per_ck <- hsi_ker_ck <- hsi_ck, hsikeron bit should be enable in rcc_cr
 
 /*
  * SPI CONFIGURATION STRUCT
@@ -117,7 +111,7 @@ void Spi_Reset(Spi_RegDef_t* pSpix);
 
 //===== DATA SENT AND RECEIVE
 void Spi_SendData(Spi_RegDef_t* pSpiHandle, uint8_t *ptxBuffer, uint32_t len);
-void Spi_ReceiveData(Spi_RegDef_t* pSpiHandle, uint8_t *prxBuffer, uint32_t len);
+void Spi_ReceiveData(Spi_RegDef_t* pSpix, uint8_t *prxBuffer, uint32_t len);
 
 //===== 	SPI INTERRUPT CONFIG
 void Spi_IrqConfig(uint8_t IrqNum, uint8_t EnorDi);

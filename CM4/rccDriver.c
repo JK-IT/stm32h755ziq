@@ -362,7 +362,6 @@ void RccSpi1_ClkSw(Spi123_SrcClk inclk)
 	else if(inclk == spi1per_clk)
 	{
 		//this clock require hsi_ker, by dfeault will not be on
-		Rcc_HsiKerEn();
 		RCC->RCC_D2CCIP1R |= (spi1per_clk << 12);
 	}
 }
