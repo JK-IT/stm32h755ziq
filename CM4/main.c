@@ -25,36 +25,57 @@
 #include <stdio.h>
 #include <string.h>
 
+#define COMMAND_LED_CTRL	0X50
+#define COMMAND_SENSOR_READ	0X51
+#define COMMAND_LED_READ	0X52
+#define COMMAND_PRINT	0X53
+#define COMMAND_ID_READ	0X54
+
+
+#define LED_ON	1
+#define LED_OFF 0
+
+#define ANALOG_PIN0	0
+#define ANALOG_PIN1	1
+#define ANALOG_PIN2	2
+#define ANALOG_PIN3	3
+#define ANALOG_PIN4	4
+
 void Delay()
 {
 	for(uint32_t i = 0; i < 250000; i++);
 }
 
-void Led13_init()
+void DelayTime(uint32_t intime)
 {
-	Gpio_Handle_t pb13Led;
-	pb13Led.pGpiox = GPIOB;
-	pb13Led.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_13;
-	pb13Led.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_OUT;
-	pb13Led.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
-	pb13Led.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PU;
-	pb13Led.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_FAST;
-	Gpio_Init(&pb13Led);
+	for(uint32_t i = 0; i < intime; i++);
 }
 
-void Led15_init()
+void Led1_init()
 {
-	Gpio_Handle_t pb15Led;
-	pb15Led.pGpiox = GPIOB;
-	pb15Led.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_15;
-	pb15Led.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_OUT;
-	pb15Led.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
-	pb15Led.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
-	pb15Led.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_FAST;
-	Gpio_Init(&pb15Led);
+	Gpio_Handle_t pb0Led;
+	pb0Led.pGpiox = GPIOB;
+	pb0Led.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_0;
+	pb0Led.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_OUT;
+	pb0Led.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
+	pb0Led.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PU;
+	pb0Led.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_HIGH;
+	Gpio_Init(&pb0Led);
 }
 
-void Led14_init()
+void Led2_init()
+{
+	Gpio_Handle_t pe1;
+	pe1.pGpiox = GPIOE;
+	pe1.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_1;
+	pe1.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_OUT;
+	pe1.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
+	pe1.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PU;
+	pe1.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_HIGH;
+	Gpio_Init(&pe1);
+}
+
+void Led3_init()
 {
 	Gpio_Handle_t pb14;
 	pb14.pGpiox = GPIOB;
@@ -66,16 +87,16 @@ void Led14_init()
 	Gpio_Init(&pb14);
 }
 
-void Butt11_init()
+void Butt15_init()
 {
-	Gpio_Handle_t pd11;
-	pd11.pGpiox = GPIOD;
-	pd11.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_11;
-	pd11.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_IN;
-	pd11.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
-	pd11.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
-	pd11.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_FAST;
-	Gpio_Init(&pd11);
+	Gpio_Handle_t pd15;
+	pd15.pGpiox = GPIOF;
+	pd15.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_15;
+	pd15.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_IN;
+	pd15.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
+	pd15.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
+	pd15.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_FAST;
+	Gpio_Init(&pd15);
 }
 
 void Spi1_init()
@@ -95,11 +116,13 @@ void Spi1_init()
 	pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_5;
 	Gpio_Init(&pa);
 
+	pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_7;
+	Gpio_Init(&pa);
+
+	pa.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
 	pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_6;
 	Gpio_Init(&pa);
 
-	pa.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_7;
-	Gpio_Init(&pa);
 
 	//config spi
 	Spi_Handle_t spi1;
@@ -117,32 +140,55 @@ void Spi1_init()
 
 }
 
+uint8_t Spi_verify_response (uint8_t res)
+{
+	if(res == 0xf5)
+	{
+		return 1;
+	} else 
+	{
+		return 0;
+	}
+
+}
+
+
 int main(void)
 {
 	Rcc_Init();
-	Led14_init();
-	Butt11_init();
+	Led1_init();
+	Led2_init();
+	Led3_init();
+	Gpio_WriteToOutputPin(GPIOB, GPIO_PIN_NO_0, OFF); //led1
+	Gpio_WriteToOutputPin(GPIOE, GPIO_PIN_NO_1, OFF); //led 2
+	Butt15_init(); //pf15
 	Spi1_init();
 	RccSpi1_ClkSw(spi1per_clk);
-	//RccSpi1_ClkSw(spi1pll2p_clk);
-	char buff[] = "so u are working now?";
-	char m1[] = "lets talk";
-
+	uint8_t dummy_write = 0xff;
+	uint8_t dummy_read = 0;
+	char buff[] = "so bug";
+	uint8_t cmd = COMMAND_LED_READ;
+	uint8_t ackbyte = 0;
+	uint32_t rd = 0;
     /* Loop forever */
 	for(;;)
 	{
-		while( ! Gpio_ReadFromInputPin(GPIOD, GPIO_PIN_NO_11))
+		while( ! Gpio_ReadFromInputPin(GPIOF, GPIO_PIN_NO_15))
 		{
-
+			Gpio_WriteToOutputPin(GPIOE, GPIO_PIN_NO_1, OFF);
 			Gpio_TogglePin(GPIOB, GPIO_PIN_NO_14);
 			Delay();
 		}
-		Delay();
-		uint8_t datlen = strlen(buff);
-		Spi_SendData(SPI1, & datlen , 1);
-		Spi_SendData(SPI1, (uint8_t*)buff , strlen(buff));
-		//Spi_SendData(SPI1, m1, strlen(m1));
+		Gpio_WriteToOutputPin(GPIOB, GPIO_PIN_NO_14, OFF);
+		Gpio_TogglePin(GPIOE, GPIO_PIN_NO_1);
+		
+		Spi_start(SPI1);
+		uint8_t datray[3] = {5, 11, 28};
+		uint8_t res = 0;
+		Spi_comm(SPI1, &datray, &res ,(sizeof datray / sizeof datray[0]), 0x02);
+		Spi_comm(SPI1, (uint8_t*)buff, &res ,strlen(buff), 0x01);
 
+		Spi_end(SPI1);
 	};
 
 	return 0;

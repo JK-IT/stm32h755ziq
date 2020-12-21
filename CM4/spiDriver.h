@@ -72,6 +72,8 @@
 #define SPI_SSPOL_LOW		0
 #define SPI_SSPOL_HIGH		1
 
+	//SPI COMMAND
+
 
 /*
  * SPI CONFIGURATION STRUCT
@@ -110,8 +112,11 @@ void Spi_Reset(Spi_RegDef_t* pSpix);
 
 
 //===== DATA SENT AND RECEIVE
-void Spi_SendData(Spi_RegDef_t* pSpiHandle, uint8_t *ptxBuffer, uint32_t len);
-void Spi_ReceiveData(Spi_RegDef_t* pSpix, uint8_t *prxBuffer, uint32_t len);
+void Spi_start(Spi_RegDef_t* pSpix);
+//void Spi_send(Spi_RegDef_t* pSpiHandle, uint8_t *inBuffer, uint32_t len, uint8_t cmd);
+void Spi_comm(Spi_RegDef_t* pSpiHandle, uint8_t *inBuffer, uint8_t* outbuff, uint32_t len, uint8_t cmd);
+void Spi_receive(Spi_RegDef_t* pSpix, uint8_t *outBuffer, uint32_t len);
+void Spi_end(Spi_RegDef_t* pSpix);
 
 //===== 	SPI INTERRUPT CONFIG
 void Spi_IrqConfig(uint8_t IrqNum, uint8_t EnorDi);
