@@ -20,7 +20,7 @@ typedef struct {	//contain values to pass into gpio configuration register
 	uint8_t Gpio_PinSpeed;
 	uint8_t Gpio_PinPuPdControl;
 	uint8_t Gpio_PinOPType;
-	uint8_t Gpio_PinAltFunMode;
+	uint8_t Gpio_PinAltFunNum;
 }Gpio_PinConfig_t;
 
 

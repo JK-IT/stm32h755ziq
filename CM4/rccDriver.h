@@ -90,6 +90,15 @@ void RccGpio_Rst(Gpio_RegDef_t * gpio);
 /*
  * SPI -RCC SECTION
  */
+// DEFAULT HSI CLK : 64 MHZ
+/*
+    CALCULATE CLK SRC FROM PLL
+    pll = ((pllsrc / divm) * divn ) / div(qpr)
+            | = frefclk  |
+          |       = fvco clk      |
+
+     fvco = divn * fref, when frac is not enabled
+*/
 
 /* ======================
  * * -----||||-----SPI MACRO FUNCTION--------------------
@@ -101,6 +110,11 @@ void RccSpi1_ClkSw(Spi123_SrcClk inclk);
 void RccSpi4_ClkSw(Spi45_SrcClk inclk);
 void RccSpi6_ClkSw(Spi6_SrcClk inclk);
 
+
+//-------- DEFAULT CLOCK SRC ENABLING FUNC FOR SPI
+// pll clks are off by default
+// spi 4 5 6 using per clk(rcc_pclk), which is on after reset
+void Spi123def_clksrc_on();
 
 
 

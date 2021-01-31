@@ -329,7 +329,7 @@ void RccSpi_Init(Spi_RegDef_t* spi)
 
 void RccSpi1_ClkSw(Spi123_SrcClk inclk)
 {
-	if(inclk == spi1pll1q_clk)
+	if(inclk == spi1pll1q_clk) //cfig and enable clk
 	{
 		if ( ! PLL1_STAT)
 		{
@@ -337,7 +337,7 @@ void RccSpi1_ClkSw(Spi123_SrcClk inclk)
 			Rcc_Toggle_SrcClk(RCC_PLL1, ENABLE);
 			while ( ! PLL1_STAT);
 		}
-		RCC->RCC_D2CCIP1R |= (spi1pll1q_clk << 12);
+		RCC->RCC_D2CCIP1R |= (spi1pll1q_clk << 12); //set target clock
 	} 
 	else if(inclk == spi1pll2p_clk)
 	{
@@ -636,4 +636,19 @@ void Rcc_Init()
 	//enable d3 run independent to cpu state or d1, d2 state
 	PWR->PWR_CPU1CR |= ( 1 << 11);
 	PWR->PWR_CPU2CR |= (1 << 11);
+}
+
+/*
+	-- ENABLE CLK SRC FOR SPI
+	-- DEFAULT PLL CLK IS DISABLED
+*/
+
+void Spi123def_clksrc_on(){ //PLL1Q
+	if ( ! PLL1_STAT)
+	{
+		// adding more tweak here - divM, divN, divPQR factor
+		PLL1Q_EN(ENABLE);
+		Rcc_Toggle_SrcClk(RCC_PLL1, ENABLE);
+		while ( ! PLL1_STAT);
+	}
 }

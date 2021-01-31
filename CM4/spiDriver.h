@@ -11,6 +11,7 @@
 #include "stm32h755xx.h"
 
 
+#define 	NULL	((void*)0)
 /*
  * REUSABLE MACROs
  */

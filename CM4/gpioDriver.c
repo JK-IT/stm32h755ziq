@@ -94,7 +94,7 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 		temp1 = pGpioHandle->Gpio_PinConfig.Gpio_PinNumber / 8;
 		temp2 = pGpioHandle->Gpio_PinConfig.Gpio_PinNumber % 8;
 		pGpioHandle->pGpiox->Afr[temp1] &= ~(0xf << (4 * temp2)); //clear bit
-		pGpioHandle->pGpiox->Afr[temp1] |= (pGpioHandle->Gpio_PinConfig.Gpio_PinAltFunMode << (4 * temp2));
+		pGpioHandle->pGpiox->Afr[temp1] |= (pGpioHandle->Gpio_PinConfig.Gpio_PinAltFunNum << (4 * temp2));
 	}
 }
 

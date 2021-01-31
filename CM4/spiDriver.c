@@ -9,7 +9,7 @@
 
 void Spi_delay()
 {
-	for(uint32_t i =0; i < 200000; i++);
+	for(uint32_t i =0; i < 290000; i++);
 }
 
 
@@ -129,7 +129,7 @@ void Spi_start(Spi_RegDef_t* pSpix)
 */
 void Spi_end(Spi_RegDef_t* pSpix)
 {
-	while(  Spi_GetFlagStatus(pSpix, SPI_STAT_RXWNE) &  Spi_GetFlagStatus(pSpix, SPI_STAT_RXPLVL)  )
+	while(  (Spi_GetFlagStatus(pSpix, SPI_STAT_RXWNE) &  Spi_GetFlagStatus(pSpix, SPI_STAT_RXPLVL)) || Spi_GetFlagStatus(pSpix, SPI_STAT_RXP)  )
 	{
 		uint32_t dispose = pSpix->SPI2S_RXDR;
 	}
@@ -160,22 +160,24 @@ void Spi_comm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32_t
 	//configure the data size in tsize of cr2, first 16bits
 	//CAN ONLY SET IF SPE = 0 OR SPI IS DISABLED
 	// if not config, the transaction will be endless , aka EOT flag will never  be set
-	uint8_t prepmess [2] = {cmd, (uint8_t)len};
-	/*pSpix->SPI_CR2 &= ~(0xff);
-	//pSpix->SPI_CR2 |= (len);
-	pSpix->SPI_CR2 |= (sizeof prepmess / sizeof prepmess[0]); // len = 1 to send cmd
-	pSpix->SPI_CR2 |= (len << 16); // the len of data buff */
+	//uint8_t prepmess [2] = {cmd, (uint8_t)len};
+	//pSpix->SPI_CR2 |= (sizeof prepmess / sizeof prepmess[0]); // len = 1 to send cmd
 
+	//pSpix->SPI_CR2 &= ~(0xff);
+	//pSpix->SPI_CR2 |= (len + 3);
+	
+	Spi_start(pSpix);
+	Spi_delay();
 	//send out command and length of array
-	for(uint8_t i = 0; i < (sizeof prepmess / sizeof prepmess[0]); i++)
-	{
-		while( ! (Spi_GetFlagStatus(SPI1, SPI_STAT_TXP)) == FLAG_SET);
-		*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = prepmess[i];
-	}
+	while( ! (Spi_GetFlagStatus(SPI1, SPI_STAT_TXP)) == FLAG_SET);
+	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = cmd;
+	
+	while( ! (Spi_GetFlagStatus(SPI1, SPI_STAT_TXP)) == FLAG_SET);
+	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = len;
+
 	//writing to txdr reg will acccess tx buffer or txfifo
 	while ( len > 0 )
 	{	
-		Spi_delay();
 		// check bit 1 in status reg: 0-no space 1-space available
 		//wait till there are spaces
 		while (!(Spi_GetFlagStatus(pSpix, SPI_STAT_TXP) == FLAG_SET));
@@ -249,7 +251,9 @@ void Spi_comm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32_t
 		*outbuff = *(( uint8_t*) &(pSpix->SPI2S_RXDR));
 	}
 	//while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_TXC));
-
+	inBuffer = NULL;
+	outbuff = NULL;
+	Spi_end(pSpix);
 }
 
 /*--------------------------
