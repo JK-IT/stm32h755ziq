@@ -150,8 +150,8 @@ void Spi_end(Spi_RegDef_t* pSpix)
 -----------------------------
 */
 
-//===== DATA SENT FUNCTION
-void Spi_comm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32_t len, uint8_t cmd)
+//===== DATA COMM FULL DUPLEX FUNCTION
+void Spi_fdcomm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32_t len)
 {
 	//getting data size from spi register
 		//data size is at cfr1 , at 5:0 bit
@@ -168,12 +168,10 @@ void Spi_comm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32_t
 	
 	Spi_start(pSpix);
 	Spi_delay();
-	//send out command and length of array
-	while( ! (Spi_GetFlagStatus(SPI1, SPI_STAT_TXP)) == FLAG_SET);
-	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = cmd;
 	
-	while( ! (Spi_GetFlagStatus(SPI1, SPI_STAT_TXP)) == FLAG_SET);
+	while( ! (Spi_GetFlagStatus(pSpix, SPI_STAT_TXP)) == FLAG_SET);
 	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = len;
+	*outbuff = (uint8_t)(pSpix->SPI2S_RXDR);
 
 	//writing to txdr reg will acccess tx buffer or txfifo
 	while ( len > 0 )
@@ -243,16 +241,14 @@ void Spi_comm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32_t
 			}
 		}
 	}
-	//send dummy to get result
-	Spi_delay();
+	//send dummy to get res
+	while (!Spi_GetFlagStatus(pSpix, SPI_STAT_TXP));
 	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = 0xfa;
-	while (Spi_GetFlagStatus(pSpix, SPI_STAT_RXP))
-	{
-		*outbuff = *(( uint8_t*) &(pSpix->SPI2S_RXDR));
-	}
+	//*outbuff = *(( uint8_t*) &(pSpix->SPI2S_RXDR));
+	*outbuff = (( uint8_t) (pSpix->SPI2S_RXDR));
 	//while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_TXC));
-	inBuffer = NULL;
-	outbuff = NULL;
+	//inBuffer = NULL;
+	//outbuff = NULL;
 	Spi_end(pSpix);
 }
 

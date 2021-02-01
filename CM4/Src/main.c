@@ -101,14 +101,14 @@ void Led4_init() // pf11
 	Gpio_Init(&pf11);
 }
 
-void Buf15_init()
+void mbutt1_init()
 {
-	Gpio_Handle_t pf15;
-	pf15.pGpiox = GPIOF;
-	pf15.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_15;
-	pf15.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_IN;
-	pf15.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PU;
-	Gpio_Init(&pf15);
+	Gpio_Handle_t butt;
+	butt.pGpiox = GPIOF;
+	butt.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_15;
+	butt.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_IN;
+	butt.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
+	Gpio_Init(&butt);
 }
 
 void Spi1_init()
@@ -211,9 +211,9 @@ int main(void)
 	Spi123def_clksrc_on();
 	Led1_init();//b0
 	Led2_init();//e1
-	Led3_init();//b14
+	Led3_init();//b14 with spi2 this is miso
 	Led4_init(); //f11
-	Buf15_init(); //pf15
+	mbutt1_init(); //pe11
 	Spi2_init();
 
 	Gpio_WriteToOutputPin(GPIOB, GPIO_PIN_NO_0, OFF); //led1
@@ -221,24 +221,20 @@ int main(void)
 	uint8_t dummy_write = 0xff;
 	uint8_t dummy_read = 0;
 	char buff[] = "so what is really the matter";
-	uint32_t rd = 0;
     /* Loop forever */
 	for(;;)
 	{
+		Gpio_WriteToOutputPin(GPIOF, GPIO_PIN_NO_11, OFF);
 		while(!Gpio_ReadFromInputPin(GPIOF, GPIO_PIN_NO_15))
 		{
-			Gpio_TogglePin(GPIOF, GPIO_PIN_NO_11);
+			Gpio_TogglePin(GPIOE, GPIO_PIN_NO_1);
 			Delay();
 		}
-		Gpio_WriteToOutputPin(GPIOF, GPIO_PIN_NO_11, ON);
-		uint8_t res = 0;
-		uint8_t datray[3] = {5, 5, 9};
-		//Spi_comm(spi1, &datray, &res ,(sizeof datray / sizeof datray[0]), 0x02);
-
-		char tb[] = "hey keep workkng";
-		//Spi_comm(spi1, (uint8_t*)&tb, &res ,strlen(tb), 0x01);
-		//Spi_comm(spi1, (uint8_t*)&buff, &res, strlen(buff), 0x01);
-		//Spi_comm(spi1, &datray, &res ,(sizeof datray / sizeof datray[0]), 0x02);
+		Gpio_TogglePin(GPIOF, GPIO_PIN_NO_11);
+		char tb[] = "hey why not running";
+		uint8_t res = 0x32;
+		Spi_fdcomm(SPI2, (uint8_t*)tb, &res, strlen(tb));
+		Delay();
 	};
 
 	return 0;

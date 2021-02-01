@@ -50,6 +50,7 @@
 	// shift by the bit position in register
 #define SPI_STAT_TXP			(1 << 1)	//txfifo space available
 #define SPI_STAT_RXP			(1 << 0) //rxfifo space available
+#define SPI_STAT_DPXP			(1 << 2) // dxp full duplex flag
 #define SPI_STAT_RXWNE	(1 << 15) //rx word not empty space available
 #define SPI_STAT_RXPLVL	(1 << 13) //rx packed frames available space available
 #define SPI_STAT_EOT 		(1 << 3) // end of transfer
@@ -115,7 +116,7 @@ void Spi_Reset(Spi_RegDef_t* pSpix);
 //===== DATA SENT AND RECEIVE
 void Spi_start(Spi_RegDef_t* pSpix);
 //void Spi_send(Spi_RegDef_t* pSpiHandle, uint8_t *inBuffer, uint32_t len, uint8_t cmd);
-void Spi_comm(Spi_RegDef_t* pSpiHandle, uint8_t *inBuffer, uint8_t* outbuff, uint32_t len, uint8_t cmd);
+void Spi_fdcomm(Spi_RegDef_t* pSpiHandle, uint8_t *inBuffer, uint8_t* outbuff, uint32_t len);
 void Spi_receive(Spi_RegDef_t* pSpix, uint8_t *outBuffer, uint32_t len);
 void Spi_end(Spi_RegDef_t* pSpix);
 
