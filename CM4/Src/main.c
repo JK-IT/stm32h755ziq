@@ -206,36 +206,18 @@ uint8_t Spi_verify_response (uint8_t res)
 int main(void)
 {
 	Rcc_Init();
-	// prepare for spi , should enabling the clk before config the spi
-	// if default clk is pll
-	Spi123def_clksrc_on();
+	
 	Led1_init();//b0
 	Led2_init();//e1
 	Led3_init();//b14 with spi2 this is miso
 	Led4_init(); //f11
 	mbutt1_init(); //pe11
-	Spi2_init();
 
-	Gpio_WriteToOutputPin(GPIOB, GPIO_PIN_NO_0, OFF); //led1
-	Gpio_WriteToOutputPin(GPIOE, GPIO_PIN_NO_1, OFF); //led 2
-	uint8_t dummy_write = 0xff;
-	uint8_t dummy_read = 0;
-	char buff[] = "so what is really the matter";
-    /* Loop forever */
+	
+
 	for(;;)
 	{
-		Gpio_WriteToOutputPin(GPIOF, GPIO_PIN_NO_11, OFF);
-		while(!Gpio_ReadFromInputPin(GPIOF, GPIO_PIN_NO_15))
-		{
-			Gpio_TogglePin(GPIOE, GPIO_PIN_NO_1);
-			Delay();
-		}
-		Gpio_TogglePin(GPIOF, GPIO_PIN_NO_11);
-		char tb[] = "hey why not running";
-		uint8_t res = 0x32;
-		Spi_fdcomm(SPI2, (uint8_t*)tb, &res, strlen(tb));
-		Delay();
-	};
 
+	}
 	return 0;
 }

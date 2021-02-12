@@ -92,9 +92,9 @@
 /*	=========================
  * ------->   NVIC SECTION <-----------
  * =========================
- * Define NVIC Register AKA NVIC TABLE
+ * Define NVIC CONTROLLER Register
  */
-
+/*
 // Interrupt Set Enable
 #define NVIC_ISER0	((__vo uint32_t*)0xe000e100)
 #define NVIC_ISER1	((__vo uint32_t*)0xe000e104)
@@ -144,21 +144,42 @@
 #define NVIC_IABR5	((__vo uint32_t*)0xe000e314)
 #define NVIC_IABR6	((__vo uint32_t*)0xe000e318)
 #define NVIC_IABR7	((__vo uint32_t*)0xe000e31c)
+*/
+typedef struct 
+{
+	__vo uint32_t ISER[8]; // 0xe000e100 -> 0xe00e11c
+	__vo uint32_t reserved1[24]; // 0xe000e120 -> 0xe000e180
+	__vo uint32_t ICER[8]; // 0xe000e180 -> 0xe000e19c
+	__vo uint32_t reserved2[24]; //0xe000e1a0 -> ex000e200
+	__vo uint32_t ISPR[8]; //0xe000e200 -> 0xe000e21c
+	__vo uint32_t reserved3[24]; //0xe000e220 -> 0xe000e280
+	__vo uint32_t ICPR[8]; //0XE000E280 -> 0XE000E29C
+	__vo uint32_t reserved4[24]; //0xe000e2a0 -> 0xe000e300
+	__vo uint32_t IABR[8]; //0XE000E300 -> 0XE000E31C
+	__vo uint32_t reserved5[56]; //0xe000e320 -> 0xe000e400
+	__vo uint8_t IPRIR[240]; //0xe000e400 -> 0xe000e4ef
+}NVIC_CONTROL_REG;
 
-//Interrupt Priority
+#define NVIC_BASEADDR 0xe000e100ul
+#define NVIC	((NVIC_CONTROL_REG *)NVIC_BASEADDR)
+
+//Interrupt Priority --MERGING WITH NVIC
 /*
+cortex m4 supports up to 240 external interrupts
  *	stm32h755ziq has 150 irq numbers or 150 interrupts
  *	so need to have 150 IPRs
  *	1 IPR can set priority number for 4 interrupts
+ *  priorty level is 256 aka 8 bits for 1 interrupts
+ * but only 4 most significant bit can be used
  */
-
+/*
 typedef struct {
-	__vo uint32_t IprTab[60];
+	__vo uint8_t IprTab[240];
 }Ipr_Reg_t;
 
 #define IPR_BASEADDR	0xe000e400ul
 #define IPR		((Ipr_Reg_t*)IPR_BASEADDR)
-
+*/
 /*	=========================
 
  * ------->   GPIO SECTION <-----------
@@ -489,16 +510,6 @@ typedef struct {
 
 #define EXTI 	((Exti_RegDef_t*)EXTI_BASEADDR)
 
-/*
- * Define the IRQ number for EXTI
- */
-#define IRQ_NO_EXTI0	6
-#define IRQ_NO_EXTI1	7
-#define IRQ_NO_EXTI2	8
-#define IRQ_NO_EXTI3	9
-#define IRQ_NO_EXTI4	10
-#define IRQ_NO_EXTI9_5	23
-#define IRQ_NO_EXTI15_10 	40
 
 
 /*  ===========================
@@ -527,5 +538,7 @@ typedef struct {
 #include "rccDriver.h"
 #include "gpioDriver.h"
 #include "spiDriver.h"
+#include "exceptionDriver.h"
+#include "syscfgDriver.h"
 
 #endif /* INC_STM32H755XX_H_ */

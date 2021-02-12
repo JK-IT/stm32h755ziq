@@ -532,6 +532,15 @@ void RccSpi_Rst(Spi_RegDef_t* spi)
 	}
 }
 
+/* ======================
+ * * -----||||-----SYSCONFG FUNCTION--------------------
+ * */
+void Rcc_sysconfClk_init()
+{
+	RCC->RCC_APB4ENR |= ( 1 << 1);
+	RCC->RCC_APB4LPENR |= (1<< 1);
+}
+
 
 /**==================================
  * Other Functions ==================
@@ -627,7 +636,7 @@ void Rcc_Toggle_SrcClk(Rcc_SrcClk inclk, uint8_t onoff)
 void Rcc_Init()
 {
 	// enable pwr block to access its reg
-	//CANNOT FIND IT IN RCC REG
+	//CANNOT FIND IT IN RCC REG so it on automatically
 	//enable syscfg
 	RCC->RCC_APB4ENR |= (1 << 1);
 	RCC->RCC_APB4LPENR |= (1 << 1);

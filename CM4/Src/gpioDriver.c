@@ -28,7 +28,7 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 	} else //extended interrupt  = detects rising/ falling edge of peri/input event
 	{
 		// enable pin as input mode but also trigger interrupt
-		// at reset all pin is set in analog mode
+		// at reset all pin is set in analog mode for this board
 		pGpioHandle->pGpiox->Moder &= ~((uint32_t)0x3 << (2 * pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
 
 		if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_FT)
@@ -209,108 +209,4 @@ void Gpio_TogglePin(Gpio_RegDef_t* pGpiox, uint8_t pinNum)
 	pGpiox->Odr ^= (1 << pinNum);
 }
 
-//============
-/*
- * fn	INTERUPT CONFIG
- *
- * BRIEF
- *
- * param 1
- * param 2
- * According to Cortex M4 General Device Guide
- * 	M4 has NVIC_XXX0 - NVIC_XXX7 / total of 8 register for masking interupt
- * 	For other registers, refer to manual
- *
- * return
- */
-void Gpio_IrqConfig(uint8_t IrqNum, uint8_t EnorDi)
-{
-	if(EnorDi == ENABLE)
-	{	// set/enable the interrupt number in NVIC table
-		if( IrqNum <= 31) // use NVIC_ISER0
-		{
-			*NVIC_ISER0 |=		(1 << IrqNum);
-		}
-		else if( IrqNum > 31 && IrqNum < 64) // use NVIC_ISER1 //32-63
-		{
-			*NVIC_ISER1 |= (1 << (IrqNum % 32));
-		}
-		else if( IrqNum >= 64 && IrqNum < 96) // use NVIC_ISER2 // 64-95
-		{
-			*NVIC_ISER2 |= (1 << (IrqNum % 32));
-		}
-		else if( IrqNum >= 96 && IrqNum < 128) // use NVIC_ISER3 // 96-127
-		{
-			*NVIC_ISER3 |= (1 << (IrqNum % 32));
-		}
-		else if( IrqNum >= 128 && IrqNum <= 149) // use NVIC_ISER4
-		{
-			*NVIC_ISER4 |= (1 << (IrqNum % 32));
-		}
-	}
-	else
-	{		//clear  the interrupt number in NVIC table
-		if( IrqNum <= 31) // use NVIC_ISER0
-		{
-			*NVIC_ICER0 &=		~(1 << IrqNum);
-		}
-		else if( IrqNum > 31 && IrqNum < 64) // use NVIC_ISER1 //32-63
-		{
-			*NVIC_ICER1 &=		~ (1 << (IrqNum % 32));
-		}
-		else if( IrqNum >= 64 && IrqNum < 96) // use NVIC_ISER2 // 64-95
-		{
-			*NVIC_ICER2 &=		~ (1 << (IrqNum % 32));
-		}
-		else if( IrqNum >= 96 && IrqNum < 128) // use NVIC_ISER3 // 96-127
-		{
-			*NVIC_ICER3 &=		~ (1 << (IrqNum % 32));
-		}
-		else if( IrqNum >= 128 && IrqNum <= 149) // use NVIC_ISER4
-		{
-			*NVIC_ICER4 &=		~ (1 << (IrqNum % 32));
-		}
-	}
 
-}
-
-/*
- * fn	SET INTERUPT PRIORITY
- *
- * BRIEF
- *
- * param 1
- * param 2
- *
- * return
- */
-void Gpio_SetIpr(uint8_t IrqNum, uint32_t IprNum)
-{
-	uint8_t iprreg = IrqNum / 4;
-	uint8_t iprpos = IrqNum % 4;
-	uint8_t shift_amount = (8 * iprpos) + (8 - NO_PRI_BITS_IMPLEMENTED);
-	IPR->IprTab[iprreg] |= (IprNum << (shift_amount));
-}
-
-
-/*
- * fn	INTERUPT HANDLING
- *
- * BRIEF
- *
- * param 1
- * param 2
- *
- * return
- */
-void Gpio_IrqHandling(uint8_t pinNum)
-{
-	// clear the exti pending register corresponding to the pin
-	if(EXTI->C2PR1 & (1 << pinNum) || EXTI->C1PR1 & (1 << pinNum))
-	{
-		//clear the pending by writing 1 into the bit, according to stm32 reference manual
-		EXTI->C2PR1 |= ( 1 << pinNum);
-		EXTI->C1PR1 |= ( 1 << pinNum);
-
-	}
-}

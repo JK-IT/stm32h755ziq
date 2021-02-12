@@ -29,7 +29,6 @@ typedef struct {	//contain values to pass into gpio configuration register
  * handle structure for gpio pin
  */
 typedef struct {
-
 	Gpio_RegDef_t *pGpiox;  //pointer to gpio port(base address) reg the pin belongs to
 	Gpio_PinConfig_t Gpio_PinConfig;
 } Gpio_Handle_t;
@@ -108,12 +107,6 @@ void Gpio_WriteToOutputPort(Gpio_RegDef_t* pGpiox, uint16_t val);
 
 void Gpio_TogglePin(Gpio_RegDef_t* pGpiox, uint8_t pinNum);
 
-//============
-void Gpio_IrqConfig(uint8_t IrqNum, uint8_t EnorDi);
-
-void Gpio_SetIpr(uint8_t IrqNum, uint32_t IprNum);
-
-void Gpio_IrqHandling(uint8_t pinNum);
 
 
 #endif /* GPIODRIVER_H_ */

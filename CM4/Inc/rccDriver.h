@@ -116,6 +116,11 @@ void RccSpi6_ClkSw(Spi6_SrcClk inclk);
 // spi 4 5 6 using per clk(rcc_pclk), which is on after reset
 void Spi123def_clksrc_on();
 
+/* ======================
+ * * -----||||-----SYSCONFG FUNCTION--------------------
+ * */
+void Rcc_sysconfClk_init();
+
 
 
 /**

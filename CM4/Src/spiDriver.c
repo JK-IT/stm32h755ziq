@@ -241,14 +241,7 @@ void Spi_fdcomm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32
 			}
 		}
 	}
-	//send dummy to get res
-	while (!Spi_GetFlagStatus(pSpix, SPI_STAT_TXP));
-	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = 0xfa;
-	//*outbuff = *(( uint8_t*) &(pSpix->SPI2S_RXDR));
-	*outbuff = (( uint8_t) (pSpix->SPI2S_RXDR));
-	//while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_TXC));
-	//inBuffer = NULL;
-	//outbuff = NULL;
+	
 	Spi_end(pSpix);
 }
 
