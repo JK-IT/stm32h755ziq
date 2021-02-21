@@ -9,7 +9,10 @@
 
 /*
  * param	gpio handle structure
- * description	configure the gpio
+ * description	configure the gpio, if the pin used as afn then set up alternative function reg
+ * if pin as detect interrupt then set as input mode
+ * else set as normal
+ * 
  */
 void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 {
@@ -25,43 +28,8 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 		pGpioHandle->pGpiox->Moder &= ~((uint32_t)0x3 << (2* pGpioHandle->Gpio_PinConfig.Gpio_PinNumber)); //clear bit
 		pGpioHandle->pGpiox->Moder |= temp; //set bit
 		temp = 0;
-	} else //extended interrupt  = detects rising/ falling edge of peri/input event
-	{
-		// enable pin as input mode but also trigger interrupt
-		// at reset all pin is set in analog mode for this board
-		pGpioHandle->pGpiox->Moder &= ~((uint32_t)0x3 << (2 * pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
+	} 
 
-		if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_FT)
-		{
-			EXTI->FTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-			//clear the bit in rising edge detection
-			EXTI->RTSR1 &= ~(1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-		}
-		else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RT)
-		{
-			EXTI->RTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-			//clear the bit in falling edge detection
-			EXTI->FTSR1 &= ~(1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-		}
-		else if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_IT_RFT)
-		{
-			//enable both detecting
-			EXTI->FTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-			//clear the bit in rising edge detection
-			EXTI->RTSR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-		}
-
-		//config port selection in syscfg_extireg
-		uint8_t temp1 = (pGpioHandle->Gpio_PinConfig.Gpio_PinNumber / 4);
-		uint8_t temp2 = (pGpioHandle->Gpio_PinConfig.Gpio_PinNumber % 4);
-		uint8_t portcode = GPIO_TO_PORTCODE(pGpioHandle->pGpiox);
-		SYSCFG->EXTICR[temp1] &= ~(0xf << (temp2 * 4));
-		SYSCFG->EXTICR[temp1] |= (portcode << (temp2 * 4));
-
-		//enable exti interrupt delivery using interrupt mask: 1-unmasked-enable, 0-masked-disable
-		EXTI->C2IMR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-		EXTI->C1IMR1 |= (1 << pGpioHandle->Gpio_PinConfig.Gpio_PinNumber);
-	}
 	temp = 0;
 	//2. speed
 	temp = (pGpioHandle->Gpio_PinConfig.Gpio_PinSpeed << (2 * pGpioHandle->Gpio_PinConfig.Gpio_PinNumber));
@@ -81,7 +49,7 @@ void Gpio_Init(Gpio_Handle_t *pGpioHandle)
 	pGpioHandle->pGpiox->Otyper |= temp;
 
 	temp =0;
-	//5. alt functionality
+	//5. alt functionality so need to set extra alternative function register
 	if(pGpioHandle->Gpio_PinConfig.Gpio_PinMode == GPIO_MODE_ALTFN)
 	{
 		/* limit number in a range

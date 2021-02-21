@@ -53,6 +53,8 @@
 #define SPI_STAT_DPXP			(1 << 2) // dxp full duplex flag
 #define SPI_STAT_RXWNE	(1 << 15) //rx word not empty space available
 #define SPI_STAT_RXPLVL	(1 << 13) //rx packed frames available space available
+#define SPI_EOT_FLAG	0x03
+#define SPI_TXFT_FLAG	0x04
 #define SPI_STAT_EOT 		(1 << 3) // end of transfer
 #define SPI_STAT_TXC 		(1 << 12) // TRANSMISSION COMPLETE
 #define SPI_STAT_MODF 		(1 << 9) // MODE FAULT
@@ -114,9 +116,18 @@ void Spi_Reset(Spi_RegDef_t* pSpix);
 
 
 //===== DATA SENT AND RECEIVE
+/*
+	SEt up data in spi config, these setting need to configured before
+	enable spi comm
+*/
+void Spi_initData(Spi_RegDef_t * pSpix, uint8_t datlen);
+
 void Spi_start(Spi_RegDef_t* pSpix);
-//void Spi_send(Spi_RegDef_t* pSpiHandle, uint8_t *inBuffer, uint32_t len, uint8_t cmd);
-void Spi_fdcomm(Spi_RegDef_t* pSpiHandle, uint8_t *inBuffer, uint8_t* outbuff, uint32_t len);
+//this will start and end the spi when done transmitting by itself
+void Spi_sent_only(Spi_RegDef_t* pSpix, uint8_t *inBuffer, uint32_t len);
+//this will just send the data without controlling the spi mechanism
+void Spi_sent(Spi_RegDef_t* pSpix, uint8_t *inBuffer, uint32_t len);
+
 void Spi_receive(Spi_RegDef_t* pSpix, uint8_t *outBuffer, uint32_t len);
 void Spi_end(Spi_RegDef_t* pSpix);
 

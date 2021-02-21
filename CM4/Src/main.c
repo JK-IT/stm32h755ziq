@@ -89,26 +89,46 @@ void Led3_init()
 	Gpio_Init(&pb14);
 }
 
-void Led4_init() // pf11
+void Led4_init() // pe12
 {
-	Gpio_Handle_t pf11;
-	pf11.pGpiox = GPIOF;
-	pf11.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_OUT;
-	pf11.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_11;
-	pf11.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
-	pf11.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_HIGH;
-	pf11.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
-	Gpio_Init(&pf11);
+	Gpio_Handle_t pe12;
+	pe12.pGpiox = GPIOE;
+	pe12.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_OUT;
+	pe12.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_12;
+	pe12.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
+	pe12.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_HIGH;
+	pe12.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
+	Gpio_Init(&pe12);
 }
 
-void mbutt1_init()
+void mbutt1_init() //e14
 {
 	Gpio_Handle_t butt;
-	butt.pGpiox = GPIOF;
-	butt.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_15;
+	butt.pGpiox = GPIOE;
+	butt.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_14;
 	butt.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_IN;
 	butt.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
 	Gpio_Init(&butt);
+}
+
+void mbutt1_risingedge()
+{
+	Gpio_Handle_t butt;
+	butt.pGpiox = GPIOE;
+	butt.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_IN;
+	butt.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_14;
+	butt.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
+	Gpio_Init(&butt);
+
+	//enable sysconf
+	Syscfg_init();
+	// set pin as iterrupt source
+	Syscfg_port_t pe = PE;
+	Syscfg_exti_source(pe, 0xe);
+	//enable exti interrupt mask
+	Exti_trigger_edge_t edge = RisingEdge;
+	Set_C2IM_ioexti(0xe, edge);
+
 }
 
 void Spi1_init()
@@ -156,7 +176,7 @@ void Spi2_init() // b12, b13, b14, b15
 {
 	//init gpio port
 	Gpio_Handle_t pbspi2;
-	pbspi2.pGpiox = GPIOB;	
+	pbspi2.pGpiox = GPIOB;
 	pbspi2.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_ALTFN;
 	pbspi2.Gpio_PinConfig.Gpio_PinAltFunNum = 5;
 	pbspi2.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
@@ -190,34 +210,67 @@ void Spi2_init() // b12, b13, b14, b15
 	Spi_Cfig(&spi2, ENABLE);
 }
 
-uint8_t Spi_verify_response (uint8_t res)
-{
-	if(res == 0xf5)
-	{
-		return 1;
-	} else 
-	{
-		return 0;
-	}
-
-}
-
+uint8_t butpressed = 0;
+uint8_t dummy = 0x6b; //K
+uint8_t led_state = OFF;
 
 int main(void)
 {
 	Rcc_Init();
-	
+	Spi2_init();
 	Led1_init();//b0
 	Led2_init();//e1
 	Led3_init();//b14 with spi2 this is miso
-	Led4_init(); //f11
-	mbutt1_init(); //pe11
+	Led4_init();
+	mbutt1_risingedge();
 
-	
-
+	char srcbuff[] = "i don't know if u gonna work again if i move on next thing";
+	char desbuff[500];
+	memset(&desbuff, 0, sizeof(desbuff));
 	for(;;)
 	{
+		while(!butpressed){
+			Gpio_WriteToOutputPin(GPIOE, 12, OFF);
+		}
+		Gpio_WriteToOutputPin(GPIOE, 12, ON);
 
+		//Delay(); // led will on for a while
+		//printf("start spi communication\n");
+
+		//break;
+		butpressed = 0;
 	}
 	return 0;
+}
+
+
+void Gpio_irq_handling(uint8_t pin)
+{
+
+	//clear pending in exti, so interrupt will be reset
+	EXTI->C2PR1 |= (1 << pin);
+	/*
+	if(led_state == OFF)
+	{
+		Gpio_TogglePin(GPIOE, GPIO_PIN_NO_12);
+		led_state = ON;
+	} else {
+		Gpio_TogglePin(GPIOE, GPIO_PIN_NO_12);
+		led_state = OFF;
+	}*/
+
+}
+
+void EXTI15_10_IRQHandler()
+{
+	Delay();
+	// TO AVOID BOUNDING BUTTON CUZ OF CHEAP HARDWARD
+	// USE A FLAG INSTEAD
+	if(butpressed){ // bouncing button , the program will jump here even it not finish sending spi
+			//set this will ignore the until the butpressed is reset to 0
+		Gpio_irq_handling(0xe);
+		return;
+	}
+	butpressed = 1;// <=== the flag
+	Gpio_irq_handling(0xe);
 }

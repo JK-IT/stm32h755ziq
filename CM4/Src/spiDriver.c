@@ -149,30 +149,33 @@ void Spi_end(Spi_RegDef_t* pSpix)
 
 -----------------------------
 */
-
-//===== DATA COMM FULL DUPLEX FUNCTION
-void Spi_fdcomm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32_t len)
+/*
+	SEt up data in spi config, these setting need to configured before
+	enable spi comm
+*/
+void Spi_initData(Spi_RegDef_t * pSpix, uint8_t datlen)
 {
-	//getting data size from spi register
-		//data size is at cfr1 , at 5:0 bit
-	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
-
 	//configure the data size in tsize of cr2, first 16bits
 	//CAN ONLY SET IF SPE = 0 OR SPI IS DISABLED
 	// if not config, the transaction will be endless , aka EOT flag will never  be set
 	//uint8_t prepmess [2] = {cmd, (uint8_t)len};
 	//pSpix->SPI_CR2 |= (sizeof prepmess / sizeof prepmess[0]); // len = 1 to send cmd
+	pSpix->SPI_CR2 &= ~(0xff);
+	pSpix->SPI_CR2 |= (datlen + 1);
+}
 
-	//pSpix->SPI_CR2 &= ~(0xff);
-	//pSpix->SPI_CR2 |= (len + 3);
-	
+
+//===== DATA SENT ONLY FUNCTION
+// it will start and end the spi comm inside the function block
+void Spi_sent_only(Spi_RegDef_t* pSpix ,uint8_t *inBuffer,uint32_t len)
+{
+	//getting data size from spi register
+		//data size is at cfr1 , at 5:0 bit
+	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
 	Spi_start(pSpix);
-	Spi_delay();
 	
 	while( ! (Spi_GetFlagStatus(pSpix, SPI_STAT_TXP)) == FLAG_SET);
-	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = len;
-	*outbuff = (uint8_t)(pSpix->SPI2S_RXDR);
-
+	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = (len);
 	//writing to txdr reg will acccess tx buffer or txfifo
 	while ( len > 0 )
 	{	
@@ -189,59 +192,43 @@ void Spi_fdcomm(Spi_RegDef_t* pSpix ,uint8_t *inBuffer, uint8_t* outbuff, uint32
 			len--;
 			inBuffer++;
 		}
-		else if ( (datsize) >=8 && (datsize) < 16 )
+	}
+
+	//clear flag
+	pSpix->SPI2S_IFCR |= (1 << SPI_EOT_FLAG);
+	pSpix->SPI2S_IFCR |= (1 << SPI_TXFT_FLAG);
+	Spi_end(pSpix);
+}
+
+//this will just send the data without controlling the spi mechanism
+void Spi_sent(Spi_RegDef_t* pSpix, uint8_t *inBuffer, uint32_t len){
+	//getting data size from spi register
+		//data size is at cfr1 , at 5:0 bit
+	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
+
+	while( ! (Spi_GetFlagStatus(pSpix, SPI_STAT_TXP)) == FLAG_SET);
+	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = (len);
+	//writing to txdr reg will acccess tx buffer or txfifo
+	while ( len > 0 )
+	{	
+		// check bit 1 in status reg: 0-no space 1-space available
+		//wait till there are spaces
+		while (!(Spi_GetFlagStatus(pSpix, SPI_STAT_TXP) == FLAG_SET));
+		//check the data size
+			//load data to data register
+		//data register is accessed byte-wise: 8bits, 16bits, 32bits
+		if( datsize < 8 )
 		{
-			if(len < 2)
-			{
-				// load data as  bits
-			    *((uint16_t*)&(pSpix->SPI2S_TXDR)) = *(inBuffer);
-				len -= 1;
-				inBuffer += 1;
-			} else
-			{
-				// load data as 16 bits
-				*((uint16_t*)&(pSpix->SPI2S_TXDR)) = *((uint16_t*)inBuffer);
-				inBuffer +=2;
-				len -=2;
-			}
-		} else if ( (datsize) >=16 && (datsize) < 32 )
-		{
-			if( len < 4)
-			{
-				uint32_t temda = 0;
-				switch (len)
-				{
-					case 3:
-						temda = (uint32_t)(*inBuffer);
-						temda |= ((uint32_t)(*++inBuffer)) << 8;
-						temda |= ((uint32_t)(*++inBuffer)) << 16;
-						*((uint32_t*)&(pSpix->SPI2S_TXDR)) = temda;
-						len -=3;
-						inBuffer += 1;
-						break;
-					case 2:
-						*((uint32_t*)&(pSpix->SPI2S_TXDR)) = *((uint16_t*)inBuffer);
-						len -=2;
-						inBuffer += 2;
-						break;
-					case 1:
-						*((uint32_t*)&(pSpix->SPI2S_TXDR)) = *(inBuffer);
-						len -=1;
-						inBuffer += 1;
-						break;
-					default:
-						break;
-					}
-			} else 
-			{
-				//load data as 32 bits
-				*((uint32_t*)&(pSpix->SPI2S_TXDR)) = *((uint32_t*)inBuffer);
-				len -= 4;
-				inBuffer +=- 4;
-			}
+			// load data as 8 bits
+			*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = *( inBuffer);
+			len--;
+			inBuffer++;
 		}
 	}
-	
+
+	//clear flag
+	pSpix->SPI2S_IFCR |= (1 << SPI_EOT_FLAG);
+	pSpix->SPI2S_IFCR |= (1 << SPI_TXFT_FLAG);
 	Spi_end(pSpix);
 }
 
@@ -259,7 +246,7 @@ void Spi_receive(Spi_RegDef_t* pSpix, uint8_t *outBuffer, uint32_t len)
 	while (len > 0)
 	{
 		//wait till buffer is non empty
-		while ( ! Spi_GetFlagStatus(pSpix, SPI_STAT_RXP));
+		while (Spi_GetFlagStatus(pSpix, SPI_STAT_RXP == FLAG_RESET));
 		if(datsize < 8)
 		{
 			*outBuffer = *( (uint8_t*)&pSpix->SPI2S_RXDR);

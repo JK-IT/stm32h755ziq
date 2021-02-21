@@ -12,18 +12,19 @@
 /*
  * Define the IRQ number for EXTI
  */
-#define IRQ_NO_EXTI0	6
-#define IRQ_NO_EXTI1	7
-#define IRQ_NO_EXTI2	8
-#define IRQ_NO_EXTI3	9
-#define IRQ_NO_EXTI4	10
-#define IRQ_NO_EXTI9_5	23
-#define IRQ_NO_EXTI15_10 	40
+#define IRQ_NO_EXTI0	0x06
+#define IRQ_NO_EXTI1	0x07
+#define IRQ_NO_EXTI2	0x08
+#define IRQ_NO_EXTI3	0x09
+#define IRQ_NO_EXTI4	0x0a
+#define IRQ_NO_EXTI9_5	0x17
+#define IRQ_NO_EXTI15_10 	0x28
 
 
 
 void SetIrqNum(uint8_t irqnum);
 void DisIrqNum(uint8_t irqnum);
+void DisPenIrq(uint8_t irqnum);
 void SetIrqPri(uint8_t irqn, uint8_t prinum);
 
 

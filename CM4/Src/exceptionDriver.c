@@ -8,8 +8,10 @@
     0xE000E000 - 0x E000EFFF
 */
 void SetIrqNum(uint8_t irqnum)
-{//       irqnum / 32 to find pos        0x1f cuz the pos start as 0 , but dec will be %32  
-    NVIC->ISER[irqnum >> 5] = 1 << (irqnum & 0x1f); // similar to irqnum % 32
+{
+	// the debugger display wrong address of this iser
+	//       irqnum / 32 to find pos        0x1f cuz the pos start as 0 , but dec will be %32
+    (NVIC->ISER[irqnum >> 5]) = (1 << (irqnum & 0x1f)); // similar to irqnum % 32
 }
 
 void DisIrqNum(uint8_t irqnum)
@@ -45,7 +47,7 @@ void Set_C2IM_ioexti(uint8_t linenum,Exti_trigger_edge_t edge){
     EXTI->C2IMR1 |= (1 << linenum); //set bit in exti cpu interrupt reg
     EXTI->D3PMR1 |= (1 << linenum); //set bit in d3 pending mask cuz this can wake any target
     //clear exti  pending reg
-    EXTI->C1PR1 |= (1 << linenum);
+    EXTI->C2PR1 |= (1 << linenum);
     //setting the trigger edge
     switch (edge)
     {
