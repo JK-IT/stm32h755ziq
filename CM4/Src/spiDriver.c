@@ -6,6 +6,7 @@
  */
 #include "spiDriver.h"
 #include "stdint.h"
+#include "stdio.h"
 
 void Spi_delay()
 {
@@ -129,10 +130,24 @@ void Spi_start(Spi_RegDef_t* pSpix)
 */
 void Spi_end(Spi_RegDef_t* pSpix)
 {
-	while(  (Spi_GetFlagStatus(pSpix, SPI_STAT_RXWNE) &  Spi_GetFlagStatus(pSpix, SPI_STAT_RXPLVL)) || Spi_GetFlagStatus(pSpix, SPI_STAT_RXP)  )
+	/*
+		check TXC FLAG IF TRANSACTION IS GOING OR TXFIFO IS EMPTY
+		IF TSIZE = 0 , AKA ENDLESS TRANSACTION, TXC RAISING WHEN TXFIFO IS EMPTY
+		IF TSIZE <> 0, TXC IS SET AT THE END OF TRANSFER
+		TXC IS GOOD FOR TRANSMISSION , BUT NOT RELIABLE TO RECEPTION
+	*/
+	while( !Spi_GetFlagStatus(pSpix, SPI_STAT_TXC));
+	// check status of RXWNE & RXPLVL BASED ON DATA FRAME
+	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
+	uint8_t dump;
+	if(datsize < 8)
 	{
-		uint32_t dispose = pSpix->SPI2S_RXDR;
+		while(Spi_GetFlagStatus(pSpix, SPI_STAT_RXPLVL)){
+			dump = *((uint8_t* )&pSpix->SPI2S_RXDR);
+			printf("END SPI DRIVER :data left in receive data regis %d\n", dump);
+		}
 	}
+	
 	// without clearing the eot flag, it won't work properly
 	//while( ! Spi_GetFlagStatus(pSpix, SPI_STAT_EOT) );
 			//clear eot or txf bit
@@ -141,6 +156,7 @@ void Spi_end(Spi_RegDef_t* pSpix)
 	pSpix->SPI2S_IFCR |= (1 << 3); //clear eot, clear this as last
 	Spi_SetCstart(pSpix, OFF);
 	Spi_Toggle(pSpix, OFF);
+	printf("END SPI DRIVER : turn off spi\n");
 }
 
 /*--------------------------
@@ -194,20 +210,15 @@ void Spi_sent_only(Spi_RegDef_t* pSpix ,uint8_t *inBuffer,uint32_t len)
 		}
 	}
 
-	//clear flag
-	pSpix->SPI2S_IFCR |= (1 << SPI_EOT_FLAG);
-	pSpix->SPI2S_IFCR |= (1 << SPI_TXFT_FLAG);
 	Spi_end(pSpix);
 }
 
 //this will just send the data without controlling the spi mechanism
+// FUNCTION WILL NOT SEND DAT LEN, DATLEN NEED TO BE SENT SEPERATLY
 void Spi_sent(Spi_RegDef_t* pSpix, uint8_t *inBuffer, uint32_t len){
 	//getting data size from spi register
 		//data size is at cfr1 , at 5:0 bit
 	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
-
-	while( ! (Spi_GetFlagStatus(pSpix, SPI_STAT_TXP)) == FLAG_SET);
-	*( (uint8_t*) &(pSpix->SPI2S_TXDR)) = (len);
 	//writing to txdr reg will acccess tx buffer or txfifo
 	while ( len > 0 )
 	{	
@@ -226,10 +237,6 @@ void Spi_sent(Spi_RegDef_t* pSpix, uint8_t *inBuffer, uint32_t len){
 		}
 	}
 
-	//clear flag
-	pSpix->SPI2S_IFCR |= (1 << SPI_EOT_FLAG);
-	pSpix->SPI2S_IFCR |= (1 << SPI_TXFT_FLAG);
-	Spi_end(pSpix);
 }
 
 /*--------------------------
@@ -243,22 +250,16 @@ void Spi_receive(Spi_RegDef_t* pSpix, uint8_t *outBuffer, uint32_t len)
 {
 	//check dat size
 	uint8_t datsize = pSpix->SPI_CFG1 & 0x1f;
-	while (len > 0)
+	while( Spi_GetFlagStatus(pSpix, SPI_STAT_RXP) == FLAG_SET)
 	{
-		//wait till buffer is non empty
-		while (Spi_GetFlagStatus(pSpix, SPI_STAT_RXP == FLAG_RESET));
-		if(datsize < 8)
-		{
-			*outBuffer = *( (uint8_t*)&pSpix->SPI2S_RXDR);
+		if( len == 0)	break;
+		if(datsize < 8){
+			//0x40003830
+			uint8_t red = *( (uint8_t*)&pSpix->SPI2S_RXDR);
+			//uint32_t red = *( (uint32_t*)0x40003830);
+			printf("SPI RECEI : from ardu %d\n", red);
 			len--;
-		}
-		else if(datsize < 16 && datsize >=8)
-		{
-			*((uint16_t*)outBuffer) = *( (uint16_t*)&pSpix->SPI2S_RXDR);
-		}
-		else if(datsize < 32 && datsize >=16)
-		{
-			*((uint32_t*)outBuffer) = pSpix->SPI2S_RXDR;
+			outBuffer++;
 		}
 	}
 }

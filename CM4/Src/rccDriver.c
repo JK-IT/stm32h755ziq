@@ -274,6 +274,7 @@ void RccSpi_Init(Spi_RegDef_t* spi)
 		} while ( (PWR->PWR_CPU2CR >> 8) & 0x1 );
 		uint32_t temp = SPI3->SPI2S_SR;
 		//-- setting default src clock
+		//Spi123def_clksrc_on();
 		if ( ! PLL1_STAT)
 		{
 			PLL1Q_EN(ENABLE);

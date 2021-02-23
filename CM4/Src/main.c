@@ -191,10 +191,21 @@ void Spi2_init() // b12, b13, b14, b15
 	// pb15 mosi output
 	pbspi2.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_15;
 	Gpio_Init(&pbspi2);
+	/*
 	//pb14 miso input
 	pbspi2.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
-	pbspi2.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_14;
+	pbspi2.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_14; */
 	Gpio_Init(&pbspi2);
+
+	Gpio_Handle_t pbspi2c;
+	pbspi2c.pGpiox = GPIOC;
+	pbspi2c.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_ALTFN;
+	pbspi2c.Gpio_PinConfig.Gpio_PinAltFunNum = 5;
+	pbspi2c.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
+	pbspi2c.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_HIGH;
+	pbspi2c.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
+	pbspi2.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_2;
+	Gpio_Init(&pbspi2c);
 
 	Spi_Handle_t spi2;
 	spi2.pSpix = SPI2;
@@ -210,35 +221,86 @@ void Spi2_init() // b12, b13, b14, b15
 	Spi_Cfig(&spi2, ENABLE);
 }
 
+void Spi5_init() //f6 nss, f7 sck, f8 miso , f9mosi
+{
+	Gpio_Handle_t pf;
+	pf.pGpiox = GPIOF;
+	pf.Gpio_PinConfig.Gpio_PinMode = GPIO_MODE_ALTFN;
+	pf.Gpio_PinConfig.Gpio_PinAltFunNum = 5;
+	pf.Gpio_PinConfig.Gpio_PinOPType = GPIO_OUT_PP;
+	pf.Gpio_PinConfig.Gpio_PinSpeed = GPIO_SPEED_HIGH;
+
+	pf.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PU;
+	//NSS
+	pf.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_6;
+	Gpio_Init(&pf);
+	//sck
+	pf.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_7;
+	Gpio_Init(&pf);
+	//mosi
+	pf.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_9;
+	Gpio_Init(&pf);
+	//miso
+	pf.Gpio_PinConfig.Gpio_PinPuPdControl = GPIO_PIN_PD;
+	pf.Gpio_PinConfig.Gpio_PinNumber = GPIO_PIN_NO_8;
+	Gpio_Init(&pf);
+
+	Spi_Handle_t spi5;
+	spi5.pSpix = SPI5;
+	spi5.SpiConfig.Spi_BusConfig = SPI_BUS_CONFIG_FD;
+	spi5.SpiConfig.Spi_DeviceMode = SPI_DEVICE_MODE_MASTER;
+	spi5.SpiConfig.Spi_CPha = SPI_CPHA_LOW;
+	spi5.SpiConfig.Spi_Cpol = SPI_CPOL_LOW;
+	spi5.SpiConfig.Spi_DSize = SPI_DSIZE_XBITS(8);
+	spi5.SpiConfig.Spi_SsPol = SPI_SSPOL_LOW;
+	spi5.SpiConfig.Spi_Ssm = SPI_SSM_DI;
+	spi5.SpiConfig.Spi_SclkSpeed = SPI_SCLK_SPEED_DIV16;
+	Spi_Cfig(&spi5, ENABLE);
+}
+
 uint8_t butpressed = 0;
-uint8_t dummy = 0x6b; //K
+uint8_t dummy = 0x45; //K
+uint8_t dumrec = 0xff;
 uint8_t led_state = OFF;
 
 int main(void)
 {
 	Rcc_Init();
-	Spi2_init();
+	//Spi2_init();
+	Spi5_init();
 	Led1_init();//b0
 	Led2_init();//e1
 	Led3_init();//b14 with spi2 this is miso
 	Led4_init();
-	mbutt1_risingedge();
+	mbutt1_init();
+	//mbutt1_risingedge();
 
-	char srcbuff[] = "i don't know if u gonna work again if i move on next thing";
+	char srcbuff[] = "ardu re u working";
+	uint8_t hello = 0x4b;
+	uint8_t datlen= (uint8_t)strlen(srcbuff);
 	char desbuff[500];
 	memset(&desbuff, 0, sizeof(desbuff));
 	for(;;)
 	{
-		while(!butpressed){
-			Gpio_WriteToOutputPin(GPIOE, 12, OFF);
-		}
-		Gpio_WriteToOutputPin(GPIOE, 12, ON);
-
+		Gpio_WriteToOutputPin(GPIOE, GPIO_PIN_NO_12, OFF);
+		while(!Gpio_ReadFromInputPin(GPIOE, GPIO_PIN_NO_14));
+		Delay();
 		//Delay(); // led will on for a while
-		//printf("start spi communication\n");
-
+		printf("start spi communication\n");
+		Spi_start(SPI5);
+		Spi_sent(SPI5, &hello, 1);
+		Spi_receive(SPI5, &dumrec, 1);
+		//printf("Main : Receive from ardu %d\n", dumrec);
+		//Spi_sent(SPI2, (uint8_t *)srcbuff, datlen);
+		Spi_sent(SPI5, &dummy, 1);
+		Spi_receive(SPI5, &dumrec, 1);
+		//printf("Main : Receive from ardu %d\n", dumrec);
+		Spi_end(SPI5);
+		Gpio_TogglePin(GPIOE, GPIO_PIN_NO_12);
 		//break;
 		butpressed = 0;
+
+		Delay();
 	}
 	return 0;
 }

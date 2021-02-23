@@ -52,7 +52,7 @@
 #define SPI_STAT_RXP			(1 << 0) //rxfifo space available
 #define SPI_STAT_DPXP			(1 << 2) // dxp full duplex flag
 #define SPI_STAT_RXWNE	(1 << 15) //rx word not empty space available
-#define SPI_STAT_RXPLVL	(1 << 13) //rx packed frames available space available
+#define SPI_STAT_RXPLVL	(3 << 13) //rx packed frames available space available
 #define SPI_EOT_FLAG	0x03
 #define SPI_TXFT_FLAG	0x04
 #define SPI_STAT_EOT 		(1 << 3) // end of transfer
