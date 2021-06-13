@@ -1,13 +1,13 @@
 /*
- * stm32h7xx.h
+ * stm32h755zi.h
  *
- *  Created on: Nov 10, 2020
- *      Author: jkgra
+ *  Created on: Apr 10, 2021
+ *      Author: kdg
  */
 
-#ifndef INC_STM32H755XX_H_
-#define INC_STM32H755XX_H_
 
+#ifndef STM32H755XX_H_
+#define STM32H755XX_H_
 #include "stdint.h"
 
 #define	__vo	volatile
@@ -69,13 +69,38 @@
 //***********************************************
 
 /*
- * base address of i2c and uart peri
+ * -------------base address of i2c
  */
 
 #define I2C1_BASEADDR	(APB1_BASEADDR + 0x5400)
 #define I2C2_BASEADDR	(APB1_BASEADDR + 0x5800)
 #define I2C3_BASEADDR	(APB1_BASEADDR + 0x5C00)
 #define I2C4_BASEADDR	(APB4_BASEADDR + 0x1C00)
+
+//*     REGISTER struct of I2c
+typedef struct
+{
+    /* data */
+    __vo uint32_t cr1;  //0x0
+    __vo uint32_t cr2;  //0x4
+    __vo uint32_t oar1; //0x8
+    __vo uint32_t oar2; //0xc
+    __vo uint32_t timingr; // 0x10
+    __vo uint32_t timeoutr1; //0x14
+    __vo uint32_t isr; //0x18
+    __vo uint32_t icr; //0x1c
+    __vo uint32_t pecr; //0x20
+    __vo uint32_t rxdr; //0x24
+    __vo uint32_t txdr; //0x28
+} I2c_reg_t;
+
+#define I2C1  ( (I2c_reg_t *) I2C1_BASEADDR)
+#define I2C2  ( (I2c_reg_t *) I2C2_BASEADDR)
+#define I2C3  ( (I2c_reg_t *) I2C3_BASEADDR)
+#define I2C4  ( (I2c_reg_t *) I2C4_BASEADDR)
+
+//* --------------END I2C SECTION
+
 
 #define UART4_BASEADDR		(APB1_BASEADDR + 0x4C00)
 #define UART5_BASEADDR		(APB1_BASEADDR + 0x5000)
@@ -145,7 +170,7 @@
 #define NVIC_IABR6	((__vo uint32_t*)0xe000e318)
 #define NVIC_IABR7	((__vo uint32_t*)0xe000e31c)
 */
-typedef struct 
+typedef struct
 {
 	__vo uint32_t ISER[8]; // 0xe000e100 -> 0xe00e11c
 	__vo uint32_t reserved1[24]; // 0xe000e120 -> 0xe000e180
@@ -202,51 +227,57 @@ typedef struct {
 #define GPIOK_BASEADDR	(AHB4_BASEADDR + 0x2800)
 
 /*
- * CFG REG OF GPIO
- */
+* 	GPIO REGISTER STRUC
+*/
 typedef struct { //with offset addr of each
-	__vo uint32_t Moder;	//0x00
-	__vo uint32_t Otyper;	//0x04
-	__vo uint32_t Ospeedr;	//0x08
-	__vo uint32_t Pupdr;	//0x0c
-	__vo uint32_t Idr;	//0x10
-	__vo uint32_t Odr;	//0x14
-	__vo uint32_t Bsrr;	//0x18
-	__vo uint32_t Lckr;	//0x1c
-	__vo uint32_t Afr[2]; //0x20 afrl, 0x24 afrh
+    __vo uint32_t Moder;	//0x00
+    __vo uint32_t Otyper;	//0x04
+    __vo uint32_t Ospeedr;	//0x08
+    __vo uint32_t Pupdr;	//0x0c
+    __vo uint32_t Idr;	//0x10
+    __vo uint32_t Odr;	//0x14
+    __vo uint32_t Bsrr;	//0x18
+    __vo uint32_t Lckr;	//0x1c
+    __vo uint32_t Afr[2]; //0x20 afrl, 0x24 afrh
 
-}Gpio_RegDef_t;
+} gpio_reg_t;
+
 
 /*
  * peripheral definition of gpio - typecast to gpio regdef
  * BUS AHB4
  */
-#define GPIOA		((Gpio_RegDef_t*) GPIOA_BASEADDR)
-#define GPIOB		((Gpio_RegDef_t*) GPIOB_BASEADDR)
-#define GPIOC		((Gpio_RegDef_t*) GPIOC_BASEADDR)
-#define GPIOD		((Gpio_RegDef_t*) GPIOD_BASEADDR)
-#define GPIOE		((Gpio_RegDef_t*) GPIOE_BASEADDR)
-#define GPIOF		((Gpio_RegDef_t*) GPIOF_BASEADDR)
-#define GPIOG		((Gpio_RegDef_t*) GPIOG_BASEADDR)
-#define GPIOH		((Gpio_RegDef_t*) GPIOH_BASEADDR)
-#define GPIOI		((Gpio_RegDef_t*) GPIOI_BASEADDR)
-#define GPIOJ		((Gpio_RegDef_t*) GPIOJ_BASEADDR)
-#define GPIOK		((Gpio_RegDef_t*) GPIOK_BASEADDR)
+#define GPIOA		((gpio_reg_t*) GPIOA_BASEADDR)
+#define GPIOB		((gpio_reg_t*) GPIOB_BASEADDR)
+#define GPIOC		((gpio_reg_t*) GPIOC_BASEADDR)
+#define GPIOD		((gpio_reg_t*) GPIOD_BASEADDR)
+#define GPIOE		((gpio_reg_t*) GPIOE_BASEADDR)
+#define GPIOF		((gpio_reg_t*) GPIOF_BASEADDR)
+#define GPIOG		((gpio_reg_t*) GPIOG_BASEADDR)
+#define GPIOH		((gpio_reg_t*) GPIOH_BASEADDR)
+#define GPIOI		((gpio_reg_t*) GPIOI_BASEADDR)
+#define GPIOJ		((gpio_reg_t*) GPIOJ_BASEADDR)
+#define GPIOK		((gpio_reg_t*) GPIOK_BASEADDR)
+
 
 /*
  * define gpio base to port code
  */
-#define GPIO_TO_PORTCODE(x)		( 	(x == GPIOA) ? 0 : \
-													(x == GPIOB) ? 1 : \
-													(x == GPIOC) ? 2 : \
-													(x == GPIOD) ? 3 : \
-													(x == GPIOE) ? 4 : \
-													(x == GPIOF) ? 5 : \
-													(x == GPIOG) ? 6 : \
-													(x == GPIOH) ? 7 : \
-													(x == GPIOI) ? 8 : \
-													(x == GPIOJ) ? 9 : \
-													(x == GPIOK) ? 10 : 0 )
+#define GPIO_TO_PORTCODE(x)		( 	((x) == GPIOA) ? 0 : \
+													((x) == GPIOB) ? 1 : \
+													((x) == GPIOC) ? 2 : \
+													((x) == GPIOD) ? 3 : \
+													((x) == GPIOE) ? 4 : \
+													((x) == GPIOF) ? 5 : \
+													((x) == GPIOG) ? 6 : \
+													((x) == GPIOH) ? 7 : \
+													((x) == GPIOI) ? 8 : \
+													((x) == GPIOJ) ? 9 : \
+													((x) == GPIOK) ? 10 : 0 )
+
+
+
+
 
 /*  ===========================
  * ----->  SPI SECTION <-------
@@ -262,31 +293,33 @@ typedef struct { //with offset addr of each
 #define SPI3_BASEADDR	(APB1_BASEADDR + 0x3C00) //D2
 
 typedef struct {
-	__vo uint32_t SPI2S_CR1; //0X00
-	__vo uint32_t SPI_CR2; //0X04
-	__vo uint32_t SPI_CFG1; //0X08
-	__vo uint32_t SPI_CFG2; //0X0C
-	__vo uint32_t SPI2S_IER; //0X10
-	__vo uint32_t SPI2S_SR; //0X14
-	__vo uint32_t SPI2S_IFCR; //0X18
-	__vo uint32_t RESERVED0; //0x1C
-	__vo uint32_t SPI2S_TXDR; //0X20
-	__vo uint32_t RESERVED1[3]; //0X24-0X2C
-	__vo uint32_t SPI2S_RXDR; //0X30
-	__vo uint32_t RESERVED2[3]; //0X34-0X3C
-	__vo uint32_t SPI_CRCPOLY; //0X40
-	__vo uint32_t SPI_TXCRC; //0X44
-	__vo uint32_t SPI_RXCRC; //0X48
-	__vo uint32_t SPI_UDRDR; //0X4C
-	__vo uint32_t SPI_I2SCFGR; //0X50
+    __vo uint32_t SPI2S_CR1; //0X00
+    __vo uint32_t SPI_CR2; //0X04
+    __vo uint32_t SPI_CFG1; //0X08
+    __vo uint32_t SPI_CFG2; //0X0C
+    __vo uint32_t SPI2S_IER; //0X10
+    __vo uint32_t SPI2S_SR; //0X14
+    __vo uint32_t SPI2S_IFCR; //0X18
+    __vo uint32_t RESERVED0; //0x1C
+    __vo uint32_t SPI2S_TXDR; //0X20
+    __vo uint32_t RESERVED1[3]; //0X24-0X2C
+    __vo uint32_t SPI2S_RXDR; //0X30
+    __vo uint32_t RESERVED2[3]; //0X34-0X3C
+    __vo uint32_t SPI_CRCPOLY; //0X40
+    __vo uint32_t SPI_TXCRC; //0X44
+    __vo uint32_t SPI_RXCRC; //0X48
+    __vo uint32_t SPI_UDRDR; //0X4C
+    __vo uint32_t SPI_I2SCFGR; //0X50
 }Spi_RegDef_t;
 
-#define SPI1 	((Spi_RegDef_t*) SPI1_BASEADDR)
+#define SPI1 		((Spi_RegDef_t*) SPI1_BASEADDR)
 #define SPI2	    ((Spi_RegDef_t*) SPI2_BASEADDR)
 #define SPI3	    ((Spi_RegDef_t*) SPI3_BASEADDR)
 #define SPI4	    ((Spi_RegDef_t*) SPI4_BASEADDR)
 #define SPI5	    ((Spi_RegDef_t*) SPI5_BASEADDR)
 #define SPI6	    ((Spi_RegDef_t*) SPI6_BASEADDR)
+
+
 
 
 /*  ===========================
@@ -523,7 +556,7 @@ typedef struct {
 	uint32_t RESERVED1; //0x00
 	__vo uint32_t PMCR; //0x04
 	__vo uint32_t EXTICR[4]; // 0x08 --- 0x14
-	__vo uint32_t CFGR; //0x18
+	__vo uint32_t CFGR; //0x18  ...
 	__vo uint32_t CCCSR; //0x20
 	__vo uint32_t CCVR; //0x24
 	__vo uint32_t CCCR; //0x28
@@ -535,10 +568,7 @@ typedef struct {
 
 #define SYSCFG				((SysCfg_RegDef_t*)SYSCFG_BASEADDR)
 
-#include "rccDriver.h"
-#include "gpioDriver.h"
-#include "spiDriver.h"
-#include "exceptionDriver.h"
-#include "syscfgDriver.h"
 
-#endif /* INC_STM32H755XX_H_ */
+#endif /* STM32H755XX_H_ */
+
+#include "kommon.h"
